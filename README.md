@@ -1,4 +1,11 @@
-# Fidelis Smart Contcracts
+# Fidelis Smart Contracts
+
+## Stack 
+- JSTeal + PureStake
+- TEAL
+
+## Models
+https://www.figma.com/file/hZLphYU3f4W9omTP562h7f/Fidelis-Smart-Contract-Models
 
 
 ---
