@@ -1,0 +1,38 @@
+{
+  "name": "smart_contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "test",
+    "debug": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliasbayona/smart_contracts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eliasbayona/smart_contracts/issues"
+  },
+  "homepage": "https://github.com/eliasbayona/smart_contracts#readme",
+  "dependencies": {
+    "algosdk": "^1.16.0",
+    "axios": "^0.27.2",
+    "body-parser": "^1.20.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-session": "^1.17.2",
+    "lusca": "^1.7.0",
+    "mongoose": "^6.2.10",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.16",
+    "xss-clean": "^0.1.1"
+  }
+}
