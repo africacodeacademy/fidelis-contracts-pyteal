@@ -4,17 +4,6 @@ const errorUtils =  require("../utils/error")
 
 /**
  * register user wallet
- * 
- * Steps
- * 1. register wallet
- * 2. transfer 25 tokens as backer tokens
- * 3. transfer 25 tokens as trust tokens
- * 4. return wallet info:
- *      - wallet address
- *      - user
- *      - balance
- *      - trust token balance
- *      - backer token balance
  */
  exports.registerUserWallet = async(req, res, next) => {
 
