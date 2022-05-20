@@ -90,56 +90,56 @@ app.get(`/wallets`, walletController.getWallets)
 
 
 
-app.get(`/test2`,  async (req, res, next) =>{
-    const algosdk = require('algosdk');
+// app.get(`/test2`,  async (req, res, next) =>{
+//     const algosdk = require('algosdk');
 
-    const kdm_client = new algosdk.Kmd(process.env.KDM_TOKEN, process.env.KDM_SERVER, process.env.KDM_PORT)
+//     const kdm_client = new algosdk.Kmd(process.env.KDM_TOKEN, process.env.KDM_SERVER, process.env.KDM_PORT)
 
-    let wallets = await kdm_client.listWallets()
+//     let wallets = await kdm_client.listWallets()
 
-    // const kdm_client = new algosdk.Kmd(process.env.KDM_TOKEN, process.env.KDM_SERVER, process.env.KDM_PORT)
+//     // const kdm_client = new algosdk.Kmd(process.env.KDM_TOKEN, process.env.KDM_SERVER, process.env.KDM_PORT)
 
-    // let wallet_password = "" // find better way of creating wallet passwords
-    // // let wallhandle= await kdm_client.listWallets()
-    // let wallethandle = (await kdm_client.initWalletHandle("da0abddc87f42070013bb8164700e3e6", wallet_password)).wallet_handle_token;
-    // console.log("Got wallet handle:", wallethandle);
-    // let accountKey = (await kdm_client.exportKey(wallethandle, wallet_password, "QPAGXU4K5P7KAKGJY45QC5TJRLY2R2SM35ZI54Y2EZHOBMYLSLVH7WIPNE")).private_key;
-    // console.log("Got wallet handle:", accountKey);
-    // let mnemonic = (await algosdk.secretKeyToMnemonic(accountKey));
-    // let sk = new Uint8Array(
-    //     accountKey
+//     // let wallet_password = "" // find better way of creating wallet passwords
+//     // // let wallhandle= await kdm_client.listWallets()
+//     // let wallethandle = (await kdm_client.initWalletHandle("da0abddc87f42070013bb8164700e3e6", wallet_password)).wallet_handle_token;
+//     // console.log("Got wallet handle:", wallethandle);
+//     // let accountKey = (await kdm_client.exportKey(wallethandle, wallet_password, "QPAGXU4K5P7KAKGJY45QC5TJRLY2R2SM35ZI54Y2EZHOBMYLSLVH7WIPNE")).private_key;
+//     // console.log("Got wallet handle:", accountKey);
+//     // let mnemonic = (await algosdk.secretKeyToMnemonic(accountKey));
+//     // let sk = new Uint8Array(
+//     //     accountKey
         
-    //   );
-    // console.log(sk.toString())
-    // return res.send(sk.toString())
-    res.send(wallets)
-})
+//     //   );
+//     // console.log(sk.toString())
+//     // return res.send(sk.toString())
+//     res.send(wallets)
+// })
 
-app.get(`/test`,  async (req, res, next) =>{
-    const {
-        walletId,
-        addr
-    } = req.query
+// app.get(`/test`,  async (req, res, next) =>{
+//     const {
+//         walletId,
+//         addr
+//     } = req.query
 
-    const algosdk = require('algosdk');
+//     const algosdk = require('algosdk');
 
-    const kdm_client = new algosdk.Kmd(process.env.KDM_TOKEN, process.env.KDM_SERVER, process.env.KDM_PORT)
+//     const kdm_client = new algosdk.Kmd(process.env.KDM_TOKEN, process.env.KDM_SERVER, process.env.KDM_PORT)
 
-    let wallet_password = "" // find better way of creating wallet passwords
-    // let wallets = await kdm_client.listWallets();
-    let wallethandle = (await kdm_client.initWalletHandle("c6ab8e7db13972a365b8135c706267a7", wallet_password)).wallet_handle_token;
-    console.log("Got wallet handle:", wallethandle);
-    let accountKey = (await kdm_client.exportKey(wallethandle, wallet_password, addr)).private_key;
-    console.log("Got wallet handle:", accountKey);
-    let mnemonic = (await algosdk.secretKeyToMnemonic(accountKey));
-    let sk = new Uint8Array(
-        accountKey
+//     let wallet_password = "" // find better way of creating wallet passwords
+//     // let wallets = await kdm_client.listWallets();
+//     let wallethandle = (await kdm_client.initWalletHandle("c6ab8e7db13972a365b8135c706267a7", wallet_password)).wallet_handle_token;
+//     console.log("Got wallet handle:", wallethandle);
+//     let accountKey = (await kdm_client.exportKey(wallethandle, wallet_password, addr)).private_key;
+//     console.log("Got wallet handle:", accountKey);
+//     let mnemonic = (await algosdk.secretKeyToMnemonic(accountKey));
+//     let sk = new Uint8Array(
+//         accountKey
         
-      );
-    console.log(sk.toString())
-    return res.send({mnemonic:mnemonic, sk:sk.toString()})
-    // res.send(wallethandle)
-})
+//       );
+//     console.log(sk.toString())
+//     return res.send({mnemonic:mnemonic, sk:sk.toString()})
+//     // res.send(wallethandle)
+// })
 
 app.listen(app.get("port"), () => {
     console.log(
