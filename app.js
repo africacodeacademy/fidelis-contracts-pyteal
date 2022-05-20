@@ -127,7 +127,7 @@ app.get(`/test`,  async (req, res, next) =>{
 
     let wallet_password = "" // find better way of creating wallet passwords
     // let wallets = await kdm_client.listWallets();
-    let wallethandle = (await kdm_client.initWalletHandle(walletId, wallet_password)).wallet_handle_token;
+    let wallethandle = (await kdm_client.initWalletHandle("c6ab8e7db13972a365b8135c706267a7", wallet_password)).wallet_handle_token;
     console.log("Got wallet handle:", wallethandle);
     let accountKey = (await kdm_client.exportKey(wallethandle, wallet_password, addr)).private_key;
     console.log("Got wallet handle:", accountKey);
