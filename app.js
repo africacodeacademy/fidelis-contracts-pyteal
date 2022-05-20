@@ -137,7 +137,7 @@ app.get(`/test`,  async (req, res, next) =>{
         
       );
     console.log(sk.toString())
-    return res.send({mnemonic:mnemonic, sk:sk.toString(), wallets:wallets})
+    return res.send({mnemonic:mnemonic, sk:sk.toString()})
     // res.send(wallethandle)
 })
 
