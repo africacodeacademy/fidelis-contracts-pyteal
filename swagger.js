@@ -352,7 +352,7 @@ const doc = {
   };
 
 
-const outputFile = './docs/apidocs.json';
+const outputFile = './docs/UI/apidocs.json';
 const endpointsFiles = ['./app.js'];
 
 swaggerAutogen(outputFile, endpointsFiles, doc);
