@@ -127,7 +127,7 @@ exports.getWalletInfo = async(address) => {
 exports.getAllWallets = async() => {
 
     try {  
-        //Connect to algo client
+        //Connect to algo clients
         const algod_server = process.env.ALGODSERVER;
         const indexer_port = process.env.INDEXERPORT;
         const algod_token = process.env.ALGOD_TOKEN
@@ -135,6 +135,20 @@ exports.getAllWallets = async() => {
         let indexer = new algosdk.Indexer(algod_token, algod_server, indexer_port)
         let accounts = await indexer.searchAccounts().do()
 
+        accounts = accounts.map(account =>{
+            let assets = account.assets.map(asset =>{
+                if(asset['asset-id']  == process.env.TRUST_TOKEN_RESERVE_ASSETID){
+                    return {...asset, "asset-name":'Fidelis Trust', unitName:'FTT'}
+                }else if(asset['asset-id']  == process.env.BACKER_TOKEN_RESERVE_ASSETID){
+                    return {...asset, "asset-name":'Fidelis Backer', unitName:'FBT'}
+                }else{
+                    return asset
+                }
+            })
+
+            account.assets = assets
+            return account
+        })
         return accounts
     }
     catch (err) {
