@@ -96,7 +96,16 @@ exports.getWalletInfo = async(address) => {
             let algod_client = new algosdk.Algodv2(algod_token, algod_server, algod_port);
 
             let account_info = await algod_client.accountInformation(address).do();
-
+            let account_assets = account_info.assets.map(asset => {
+                if(asset['asset-id']  === process.env.TRUST_TOKEN_RESERVE_ASSETID){
+                    return {...asset, "asset-name":'Fidelis Trust', unitName:'FTT'}
+                }else if(asset['asset-id']  === process.env.BACKER_TOKEN_RESERVE_ASSETID){
+                    return {...asset, "asset-name":'Fidelis Backer', unitName:'FBT'}
+                }else{
+                    return asset
+                }
+            })
+            account_info["assets"] = account_assets
             return account_info
 
     

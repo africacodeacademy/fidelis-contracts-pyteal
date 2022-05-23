@@ -5,7 +5,7 @@ const doc = {
       title: 'Fidelis API DOC',
       description: 'Description',
     },
-    host: 'localhost:8081',
+    host: 'http://13.246.47.176',
     schemes: ['http'],
     basePath:"/contracts",
     consumes: ['application/json'], 
@@ -47,6 +47,18 @@ const doc = {
                                         format: 'int32',
                                         description: 'Asset / token global identifier',
                                         example:1
+                                    },
+                                    'asset-name': {
+                                        type: 'string',
+                                        format: 'string',
+                                        description: 'Asset / token name',
+                                        example:"Fidelis Trust"
+                                    },
+                                    'unitName': {
+                                        type: 'string',
+                                        format: 'string',
+                                        description: 'Asset / token unit name',
+                                        example:"Fidelis Trust"
                                     },
                                     'is-frozen': {
                                         type: 'boolean',
