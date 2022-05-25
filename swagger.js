@@ -32,43 +32,9 @@ const doc = {
                         type: 'array',
                         format: 'int32',
                         description: 'List of assets (tokens) the wallet holds',
-                        items:[
-                            {
-                                type:'object',
-                                properties:{
-                                    amount: {
-                                        type: 'number',
-                                        format: 'double',
-                                        description: 'Asset balance',
-                                        example:25.6
-                                    },
-                                    'asset-id': {
-                                        type: 'integer',
-                                        format: 'int32',
-                                        description: 'Asset / token global identifier',
-                                        example:1
-                                    },
-                                    'asset-name': {
-                                        type: 'string',
-                                        format: 'string',
-                                        description: 'Asset / token name',
-                                        example:"Fidelis Trust"
-                                    },
-                                    'unitName': {
-                                        type: 'string',
-                                        format: 'string',
-                                        description: 'Asset / token unit name',
-                                        example:"FTT"
-                                    },
-                                    'is-frozen': {
-                                        type: 'boolean',
-                                        format: '-',
-                                        description: 'AAsset / token status',
-                                        example:false
-                                    },
-                                }
-                            }
-                        ]
+                        items:{
+                            "$ref": "#/components/schemas/token-asset"
+                        }
                     },
                     'min-balance': {
                         type: 'integer',
@@ -332,24 +298,40 @@ const doc = {
                 }
             },
             'token-asset': {
-                'type': 'object',
-                'properties': {
-                    'asset-index':{
-                        type: 'integer',
-                        format: 'int32',
-                        description: 'Token asset global index',
-                        example:1000
-                    },
-                    'confirmed-round': {
-                        type: 'integer',
-                        format: 'int32',
-                        description: 'Transaction confirmed round',
-                        example:1000
-                    },
-                    'pool-error': {
-                        type: 'string',
-                    }                    
-                }
+                    type:'object',
+                    properties:{
+                        'amount': {
+                            type: 'number',
+                            format: 'double',
+                            description: 'Asset balance',
+                            example:25.6
+                        },
+                        'asset-id': {
+                            type: 'integer',
+                            format: 'int32',
+                            description: 'Asset / token global identifier',
+                            example:1
+                        },
+                        'asset-name': {
+                            type: 'string',
+                            format: 'string',
+                            description: 'Asset / token name',
+                            example:"Fidelis Trust"
+                        },
+                        'unitName': {
+                            type: 'string',
+                            format: 'string',
+                            description: 'Asset / token unit name',
+                            example:"FTT"
+                        },
+                        'is-frozen': {
+                            type: 'boolean',
+                            format: '-',
+                            description: 'AAsset / token status',
+                            example:false
+                        },
+                    }
+                
             },
         },
         '@parameters':{

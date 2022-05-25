@@ -23,12 +23,6 @@ exports.createWallet = async(uniqueIdentifier) => {
     try {  
 
         const kdm_client = new algosdk.Kmd(process.env.KDM_TOKEN, process.env.KDM_SERVER, process.env.KDM_PORT)
-        const algod_server = process.env.ALGODSERVER;
-        const algod_port = process.env.ALGODPORT;
-        const algod_token = process.env.ALGOD_TOKEN
-
-        let algod_client = new algosdk.Algodv2(algod_token, algod_server, algod_port);
-
             
         let wallet_password = uniqueIdentifier // find better way of creating wallet passwords
 
