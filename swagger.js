@@ -57,13 +57,36 @@ const doc = {
                     'total-assets-opted-in': {
                         type: 'integer',
                         format: 'int32',
-                        description: 'total number of unique assets the  account has opted-in to holding/recieving',
+                        description: 'total number of unique assets the account has opted-in to holding/recieving',
                         example:0
                     },
                     'total-apps-opted-in': {
                         type: 'integer',
                         format: 'int32',
-                        description: 'total number of applications / contracts the  account has opted-in to',
+                        description: 'total number of applications / contracts the account has opted-in to',
+                        example:0,
+                    },
+                    'total-created-apps': {
+                        type: 'integer',
+                        format: 'int32',
+                        description: 'total number of applications / contracts the account has created',
+                        example:0,
+                    },
+                    'total-created-assets': {
+                        type: 'integer',
+                        format: 'int32',
+                        description: 'total number of assets / tokens the account has created',
+                        example:0,
+                    },
+                    'account_mnemonic': {
+                        type: 'string',
+                        format: 'mnemonic',
+                        description: 'Account secrete phrases',
+                        example:0,
+                    },
+                    'sk': {
+                        type: 'string',
+                        description: 'Wallet private key',
                         example:0,
                     }
                 }
@@ -327,7 +350,7 @@ const doc = {
                     'is-frozen': {
                         type: 'boolean',
                         format: '-',
-                        description: 'AAsset / token status',
+                        description: 'Asset / token status',
                         example:false
                     },
                 }

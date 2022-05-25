@@ -109,7 +109,12 @@ exports.getWalletInfo = async(address) => {
                 }
             })
             account_info["assets"] = account_assets
-
+            delete account_info["amount-without-pending-rewards"]
+            delete account_info["apps-total-schema"]
+            delete  account_info["pending-rewards"]
+            delete account_info["reward-base"]
+            delete account_info["rewards"]
+            
             return account_info
 
     
