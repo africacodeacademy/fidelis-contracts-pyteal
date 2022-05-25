@@ -298,39 +298,39 @@ const doc = {
                 }
             },
             'token-asset': {
-                    type:'object',
-                    properties:{
-                        'amount': {
-                            type: 'number',
-                            format: 'double',
-                            description: 'Asset balance',
-                            example:25.6
-                        },
-                        'asset-id': {
-                            type: 'integer',
-                            format: 'int32',
-                            description: 'Asset / token global identifier',
-                            example:1
-                        },
-                        'asset-name': {
-                            type: 'string',
-                            format: 'string',
-                            description: 'Asset / token name',
-                            example:"Fidelis Trust"
-                        },
-                        'unitName': {
-                            type: 'string',
-                            format: 'string',
-                            description: 'Asset / token unit name',
-                            example:"FTT"
-                        },
-                        'is-frozen': {
-                            type: 'boolean',
-                            format: '-',
-                            description: 'AAsset / token status',
-                            example:false
-                        },
-                    }
+                type:'object',
+                properties:{
+                    'amount': {
+                        type: 'number',
+                        format: 'double',
+                        description: 'Asset balance',
+                        example:25.6
+                    },
+                    'asset-id': {
+                        type: 'integer',
+                        format: 'int32',
+                        description: 'Asset / token global identifier',
+                        example:1
+                    },
+                    'asset-name': {
+                        type: 'string',
+                        format: 'string',
+                        description: 'Asset / token name',
+                        example:"Fidelis Trust"
+                    },
+                    'unitName': {
+                        type: 'string',
+                        format: 'string',
+                        description: 'Asset / token unit name',
+                        example:"FTT"
+                    },
+                    'is-frozen': {
+                        type: 'boolean',
+                        format: '-',
+                        description: 'AAsset / token status',
+                        example:false
+                    },
+                }
                 
             },
         },
