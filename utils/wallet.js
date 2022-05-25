@@ -23,7 +23,13 @@ exports.createWallet = async(uniqueIdentifier) => {
     try {  
 
         const kdm_client = new algosdk.Kmd(process.env.KDM_TOKEN, process.env.KDM_SERVER, process.env.KDM_PORT)
+        const algod_server = process.env.ALGODSERVER;
+        const algod_port = process.env.ALGODPORT;
+        const algod_token = process.env.ALGOD_TOKEN
 
+        let algod_client = new algosdk.Algodv2(algod_token, algod_server, algod_port);
+
+            
         let wallet_password = uniqueIdentifier // find better way of creating wallet passwords
 
         let walletId = (await kdm_client.createWallet(uniqueIdentifier, wallet_password,"","sqlite")).wallet.id
@@ -49,11 +55,14 @@ exports.createWallet = async(uniqueIdentifier) => {
 
         let first_seed = await transactionUtilities.seedAccWithAlgos(account.address)
         //TODO: seed backer tokens
-        let backerTokenInfo = transactionUtilities.transferTokens(account.address, token_reserve_address, token_reserve_sk, accountKey, 25, trust_token_asset_id, "Fidelis trus token seed txn")
+        let backerTokenInfo = await transactionUtilities.transferTokens(account.address, token_reserve_address, token_reserve_sk, accountKey, 25, trust_token_asset_id, "Fidelis trus token seed txn")
         //TODO: seed trust tokens
-        let trustTokenInfo = transactionUtilities.transferTokens(account.address, token_reserve_address, token_reserve_sk, accountKey, 25, backer_token_asset_id, "Fidelis backer token seed txn")
+        let trustTokenInfo = await transactionUtilities.transferTokens(account.address, token_reserve_address, token_reserve_sk, accountKey, 25, backer_token_asset_id, "Fidelis backer token seed txn")
         // save wallet info to db
-        let walletInfo = await this.getWalletInfo(account.address)
+        // let account_info = await algod_client.accountInformation(account.address).do();
+        // console.log(account_info)
+        
+        var walletInfo = await this.getWalletInfo(account.address)
 
         const wallet = await new Wallet({
             user:uniqueIdentifier,
@@ -106,6 +115,7 @@ exports.getWalletInfo = async(address) => {
                 }
             })
             account_info["assets"] = account_assets
+
             return account_info
 
     
