@@ -47,10 +47,8 @@ const errorUtils =  require("../utils/error")
 
     }
     catch (err) {
-        
         err = errorUtils.errorParser(err)
-        console.log("err", err);
-        res.status(400).json(err)
+        res.status(400)//.json(err)
         return next(err)
     }
 }

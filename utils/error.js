@@ -7,7 +7,7 @@
  */
 exports.errorParser = (errorObject) => {
     
-    console.log(Object.keys(errorObject.response),  "keys ", Object.keys(errorObject),  errorObject.response.error)
+    console.log(Object.keys(errorObject.response),  "keys ", Object.keys(errorObject))
     // return errorObject
     
     if(['ECONNREFUSED'].includes(errorObject.code)){
