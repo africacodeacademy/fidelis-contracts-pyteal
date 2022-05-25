@@ -89,7 +89,7 @@ exports.getWalletDetails = async(req, res, next) => {
         console.log("err", Object.keys(err));
         err = errorUtils.errorParser(err)
         res.status(500).json({"ERROR": err})
-        return next(err)
+        // return next(err)
     }
 }
 
@@ -119,7 +119,7 @@ exports.getWallets = async(req, res, next) => {
         console.log("err", err);
         err = errorUtils.errorParser(err)
         res.status(500).json({"ERROR": err})
-        return next(err)
+        // return next(err)
     }
 }
 
@@ -162,6 +162,6 @@ exports.fetchAccountTransactions = async(req, res, next) => {
         console.log("err", err);
         err = errorUtils.errorParser(err)
         res.status(500).json({"ERROR": err})
-        return next(err)
+        // return next(err)
     }
 }

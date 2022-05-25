@@ -49,7 +49,7 @@ const errorUtils = require("../utils/error")
         // console.log("err", err);
         err = errorUtils.errorParser(err)
         res.status(500).json({"ERROR": err})
-        return next(err)
+        // return next(err)
     }
 }
 
@@ -103,6 +103,6 @@ exports.mintBackerTokensAsset = async(req, res, next) => {
         console.log("err", err);
         err = errorUtils.errorParser(err)
         res.status(500).json({"ERROR": err})
-        return next(err)
+        // return next(err)
     }
 }
