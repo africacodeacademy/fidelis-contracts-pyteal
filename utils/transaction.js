@@ -32,8 +32,6 @@ exports.transferTokens = async(receiver_address, sender_address, sender_sk, rece
         let client_status = await algod_client.status().do()
 
         const feePerByte = 1000;
-        const firstValidRound = 9000;
-        const lastValidRound = 10000;
         var genesisHash = process.env.GENESIS_HASH;
         
 
@@ -69,7 +67,7 @@ exports.transferTokens = async(receiver_address, sender_address, sender_sk, rece
         suggestedParams.fee = feePerByte
         suggestedParams.flatFee = true
         suggestedParams.firstRound = client_status["last-round"]
-        suggestedParams.lastRound = client_status["next-version-round"]+2
+        suggestedParams.lastRound = client_status["next-version-round"]+6
         suggestedParams.genesisHash = genesisHash
       
         
@@ -95,7 +93,7 @@ exports.transferTokens = async(receiver_address, sender_address, sender_sk, rece
 
         let tx = (await algod_client.sendRawTransaction(signedTxn).do());
 
-        const ptx = await algosdk.waitForConfirmation(algod_client, tx.txId, 4);
+        const ptx = await algosdk.waitForConfirmation(algod_client, tx.txId, 6);
         
 
         console.log("Transaction " + tx.txId + " confirmed in round " + ptx["confirmed-round"]);

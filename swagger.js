@@ -58,7 +58,7 @@ const doc = {
                                         type: 'string',
                                         format: 'string',
                                         description: 'Asset / token unit name',
-                                        example:"Fidelis Trust"
+                                        example:"FTT"
                                     },
                                     'is-frozen': {
                                         type: 'boolean',
