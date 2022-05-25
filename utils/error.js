@@ -7,9 +7,6 @@
  */
 exports.errorParser = (errorObject) => {
     
-    console.log(Object.keys(errorObject.response),  "keys ", Object.keys(errorObject))
-    // return errorObject
-    
     if(['ECONNREFUSED'].includes(errorObject.code)){
         return {"ERROR":`Microservice unreachable at ${errorObject.address}:${errorObject.port}`}
     }else if([400].includes(errorObject.status)){
