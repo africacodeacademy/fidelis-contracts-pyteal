@@ -50,7 +50,7 @@ const errorUtils =  require("../utils/error")
         
         err = errorUtils.errorParser(err)
         console.log("err", err);
-        res.status(500).json(err)
+        res.status(400).json(err)
         return next(err)
     }
 }
