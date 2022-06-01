@@ -208,21 +208,21 @@ exports.transaferPoints = async(req, res, next) => {
                         },
                         amount: {
                             type: "Number",
-                            description: Amount to be sent',
+                            description: 'Amount to be sent',
                             example:5.0
                         },
                         tokenAssetId: {
                             type: "Number",
-                            description: Identifier of token asset to be sent',
+                            description: 'Identifier of token asset to be sent',
                             example:5
                         },
                         note: {
                             type: "String",
-                            description: "Transaction Reference',
+                            description: 'Transaction Reference',
                             example:"token sent"
                         }      
                     },
-                    required: ["uniqueIdentifier"]
+                    required: ["receiver_address","sender_address","sender_sk","receiver_sk","amount","tokenAssetId"]
                 }
             },
         }        
