@@ -176,7 +176,7 @@ exports.fetchAccountTransactions = async(req, res, next) => {
  */
 exports.transaferPoints = async(req, res, next) => {
     /**
-     * #swagger.tags = ['Wallet / Account']
+     * #swagger.tags = ['Fidelis Trust Tokens', 'Fidelis Backer Tokens']
      * #swagger.summary = 'Transfer points'
      * #swagger.description = 'Use this endpoint to transfer tokens between wallet addresses'
     #swagger.requestBody {

@@ -84,6 +84,7 @@ app.post(`/mint/backertokens`, assetController.mintBackerTokensAsset)
 app.post(`/wallet`, walletController.registerUserWallet)
 app.get(`/wallet`, walletController.getWalletDetails)
 app.get(`/wallet/transactions`, walletController.fetchAccountTransactions)
+app.post(`/wallet/send`, walletController.transaferPoints)
 app.get(`/wallets`, walletController.getWallets)
 
 
