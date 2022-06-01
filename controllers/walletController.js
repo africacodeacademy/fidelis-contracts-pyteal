@@ -165,3 +165,124 @@ exports.fetchAccountTransactions = async(req, res, next) => {
         // return next(err)
     }
 }
+
+/**
+ * transaferPoints
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
+exports.transaferPoints = async(req, res, next) => {
+    /**
+     * #swagger.tags = ['Wallet / Account']
+     * #swagger.summary = 'Transfer points'
+     * #swagger.description = 'Use this endpoint to transfer tokens between wallet addresses'
+    #swagger.requestBody {
+        required: true,
+        "@content": { 
+            "application/json": {
+              "schema": {
+                    type: "object",
+                    properties: {
+                        receiver_address: {
+                            type: "string",
+                            description: 'Recieving wallet address',
+                            example:"NSDLUILQUOY3W98ENAOWEIU9DWHOISHCLJCJ49E0"
+                        },
+                        sender_address: {
+                            type: "string",
+                            description: 'Sender wallet address',
+                            example:"KLASJF7A83YY0QUJDOAISUD9238HDIASUGDGOQ83"
+                        },
+                        sender_sk: {
+                            type: "string",
+                            description: 'Sender wallet secrete key',
+                            example:"njgsd87t238dhwisd"
+                        },
+                        receiver_sk: {
+                            type: "string",
+                            description: 'Reciever wallet secrete key',
+                            example:"njgsd87t238dhwisd"
+                        },
+                        amount: {
+                            type: "Number",
+                            description: Amount to be sent',
+                            example:5.0
+                        },
+                        tokenAssetId: {
+                            type: "Number",
+                            description: Identifier of token asset to be sent',
+                            example:5
+                        },
+                        note: {
+                            type: "String",
+                            description: "Transaction Reference',
+                            example:"token sent"
+                        }      
+                    },
+                    required: ["uniqueIdentifier"]
+                }
+            },
+        }        
+    }
+    #swagger.responses[200] = {
+        description: 'transaction object',
+        schema: {$ref:'#/components/schemas/transactions-object'}
+    }  
+     */
+    try {  
+
+        const {
+            receiver_address,
+            sender_address,
+            sender_sk,
+            receiver_sk,
+            amount,
+            tokenAssetId,
+            note
+        } = req.post
+        
+        if(typeof receiver_address === "undefined")
+        {
+            return res.status(400).json({"ERROR":`Invalid address, ${receiver_address}`})
+        }
+
+        if(typeof sender_address === "undefined")
+        {
+            return res.status(400).json({"ERROR":`Invalid address, ${sender_address}`})
+        }
+
+        if(typeof sender_sk === "undefined")
+        {
+            return res.status(400).json({"ERROR":`Invalid sender_sk, ${sender_sk}`})
+        }
+
+        if(typeof receiver_sk === "undefined")
+        {
+            return res.status(400).json({"ERROR":`Invalid receiver_sk, ${receiver_sk}`})
+        }
+
+        if(typeof amount === "undefined")
+        {
+            return res.status(400).json({"ERROR":`Invalid amount, ${amount}`})
+        }
+
+        if(typeof tokenAssetId === "undefined")
+        {
+            return res.status(400).json({"ERROR":`Invalid tokenAssetId, ${tokenAssetId}`})
+        }
+
+        var transactionsData = await transactionUtils.transferTokens(receiver_address, sender_address, sender_sk, receiver_sk, amount, tokenAssetId, note)
+
+        return res.send(transactionsData)
+
+    }
+    catch (err) {
+        console.log("err", err);
+        err = errorUtils.errorParser(err)
+        res.status(500).json({"ERROR": err})
+        // return next(err)
+    }
+}
