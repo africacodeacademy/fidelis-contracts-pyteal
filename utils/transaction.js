@@ -144,7 +144,7 @@ exports.seedAccWithAlgos = async (receiver_address) => {
     await algod_client.sendRawTransaction(signedTxn).do();
 
     // Wait for confirmation
-    let confirmedTxn = await algosdk.waitForConfirmation(algod_client, txId, 4);
+    let confirmedTxn = await algosdk.waitForConfirmation(algod_client, txId, 10);
 
     //Get the completed Transaction
     console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
