@@ -91,37 +91,37 @@ app.get(`/wallet/transactions`, walletController.fetchAccountTransactions);
 app.post(`/wallet/send`, walletController.transaferPoints);
 app.get(`/wallets`, walletController.getWallets);
 
-app.get(`/init`, async (req, res, next) => {
-  const algosdk = require("algosdk");
+// app.get(`/init`, async (req, res, next) => {
+//   const algosdk = require("algosdk");
 
-  // let algodclient = new algosdk.Algodv2(
-  //   process.env.KDM_TOKEN,
-  //   process.env.ALGODSERVER,
-  //   ALGODPORT.port
-  // );
+//   // let algodclient = new algosdk.Algodv2(
+//   //   process.env.KDM_TOKEN,
+//   //   process.env.ALGODSERVER,
+//   //   ALGODPORT.port
+//   // );
 
-  console.log(
-    "========================TOKEN_RESERVE_ADDRESS====================="
-  );
-  let account = algosdk.generateAccount();
-  console.log("Account Address: ", account.addr);
+//   console.log(
+//     "========================TOKEN_RESERVE_ADDRESS====================="
+//   );
+//   let account = algosdk.generateAccount();
+//   console.log("Account Address: ", account.addr);
 
-  let mn = algosdk.secretKeyToMnemonic(account.sk);
-  console.log("Account Mnemonic: ", mn);
+//   let mn = algosdk.secretKeyToMnemonic(account.sk);
+//   console.log("Account Mnemonic: ", mn);
 
-  var sk = algosdk.mnemonicToSecretKey(mn);
-  console.log("Account sk: ", sk);
+//   var sk = algosdk.mnemonicToSecretKey(mn);
+//   console.log("Account sk: ", sk);
 
-  console.log("========================ADMIN_ADDRESS=====================");
-  let account2 = algosdk.generateAccount();
-  console.log("Account Address: ", account2.addr);
+//   console.log("========================ADMIN_ADDRESS=====================");
+//   let account2 = algosdk.generateAccount();
+//   console.log("Account Address: ", account2.addr);
 
-  let mn2 = algosdk.secretKeyToMnemonic(account2.sk);
-  console.log("Account Mnemonic: ", mn2);
+//   let mn2 = algosdk.secretKeyToMnemonic(account2.sk);
+//   console.log("Account Mnemonic: ", mn2);
 
-  var sk2 = algosdk.mnemonicToSecretKey(mn2);
-  console.log("Account sk: ", sk2);
-});
+//   var sk2 = algosdk.mnemonicToSecretKey(mn2);
+//   console.log("Account sk: ", sk2);
+// });
 
 // app.get(`/test2`,  async (req, res, next) =>{
 //     const algosdk = require('algosdk');
