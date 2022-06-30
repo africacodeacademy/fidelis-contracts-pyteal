@@ -376,6 +376,163 @@
           }
         }
       }
+    },
+    "/loans/create": {
+      "get": {
+        "tags": [
+          "Loan"
+        ],
+        "summary": "Create",
+        "description": "Endpoint creates a smart contract loan, checks loan requirement    * conditions and deployes a smart contract on the algorand block chain, returns tthe smart    * contract address",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "object"
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "address": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "description": {
+                              "type": "string",
+                              "example": "contract block chain address"
+                            },
+                            "example": {
+                              "type": "string",
+                              "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "object"
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "address": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "description": {
+                              "type": "string",
+                              "example": "contract block chain address"
+                            },
+                            "example": {
+                              "type": "string",
+                              "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reciever_address": {
+                    "type": "string",
+                    "description": "loan reciever wallet address",
+                    "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
+                  },
+                  "reciever_staked_points": {
+                    "type": "number",
+                    "description": "loan reciever points staked again the loan",
+                    "example": "25"
+                  },
+                  "loan_amount": {
+                    "type": "number",
+                    "description": "loan amount",
+                    "example": "25"
+                  },
+                  "agent_address": {
+                    "type": "string",
+                    "description": "agent_address",
+                    "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
+                  },
+                  "start_date": {
+                    "type": "Date",
+                    "description": "Valid DateTime object, when the loan starts"
+                  },
+                  "end_date": {
+                    "type": "Date",
+                    "description": "Valid DateTime object, when the loan ends"
+                  },
+                  "backers": {
+                    "type": "object",
+                    "description": "List of backer address and respective staked backer points",
+                    "properties": {
+                      "address": {
+                        "type": "string",
+                        "description": "backer wallet address",
+                        "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
+                      },
+                      "points": {
+                        "type": "number",
+                        "description": "backer staked points",
+                        "example": "25"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "reciever_address",
+                  "reciever_staked_points",
+                  "loan_amount",
+                  "agent_address",
+                  "start_date",
+                  "end_date",
+                  "backers"
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

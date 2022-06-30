@@ -1,7 +1,7 @@
 /**
  * initialize a loan
  */
-exports.registerUserWallet = async (req, res, next) => {
+exports.createLoan = async (req, res, next) => {
   /**
      * #swagger.tags = ['Loan']
      * #swagger.summary = 'Create'
@@ -63,11 +63,11 @@ exports.registerUserWallet = async (req, res, next) => {
                     },
                     required: ["reciever_address","reciever_staked_points", "loan_amount", "agent_address", "start_date", "end_date", "backers"]
                 }
-            },
+            }
         }        
     }
     #swagger.responses[200] = {
-        description: 'Wallet Object',
+        description: '',
         schema: {
             type: "object",
             properties: {
@@ -76,6 +76,7 @@ exports.registerUserWallet = async (req, res, next) => {
                     description: 'contract block chain address',
                     example:"hgs568i2yyrr6yfa8s7dfavysdtf86"
                 },
+            }
         }
     }  
      */
