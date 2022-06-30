@@ -258,6 +258,95 @@
         }
       }
     },
+    "/wallet/send": {
+      "post": {
+        "tags": [
+          "Fidelis Trust Tokens",
+          "Fidelis Backer Tokens"
+        ],
+        "summary": "Transfer points",
+        "description": "Use this endpoint to transfer tokens between wallet addresses",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "transaction object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/transactions-object"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/transactions-object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "receiver_address": {
+                    "type": "string",
+                    "description": "Recieving wallet address",
+                    "example": "NSDLUILQUOY3W98ENAOWEIU9DWHOISHCLJCJ49E0"
+                  },
+                  "sender_address": {
+                    "type": "string",
+                    "description": "Sender wallet address",
+                    "example": "KLASJF7A83YY0QUJDOAISUD9238HDIASUGDGOQ83"
+                  },
+                  "sender_sk": {
+                    "type": "string",
+                    "description": "Sender wallet secrete key",
+                    "example": "njgsd87t238dhwisd"
+                  },
+                  "receiver_sk": {
+                    "type": "string",
+                    "description": "Reciever wallet secrete key",
+                    "example": "njgsd87t238dhwisd"
+                  },
+                  "amount": {
+                    "type": "Number",
+                    "description": "Amount to be sent",
+                    "example": 5
+                  },
+                  "tokenAssetId": {
+                    "type": "Number",
+                    "description": "Identifier of token asset to be sent",
+                    "example": 5
+                  },
+                  "note": {
+                    "type": "String",
+                    "description": "Transaction Reference",
+                    "example": "token sent"
+                  }
+                },
+                "required": [
+                  "receiver_address",
+                  "sender_address",
+                  "sender_sk",
+                  "receiver_sk",
+                  "amount",
+                  "tokenAssetId"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/wallets": {
       "get": {
         "tags": [
@@ -343,13 +432,36 @@
           "total-assets-opted-in": {
             "type": "integer",
             "format": "int32",
-            "description": "total number of unique assets the  account has opted-in to holding/recieving",
+            "description": "total number of unique assets the account has opted-in to holding/recieving",
             "example": 0
           },
           "total-apps-opted-in": {
             "type": "integer",
             "format": "int32",
-            "description": "total number of applications / contracts the  account has opted-in to",
+            "description": "total number of applications / contracts the account has opted-in to",
+            "example": 0
+          },
+          "total-created-apps": {
+            "type": "integer",
+            "format": "int32",
+            "description": "total number of applications / contracts the account has created",
+            "example": 0
+          },
+          "total-created-assets": {
+            "type": "integer",
+            "format": "int32",
+            "description": "total number of assets / tokens the account has created",
+            "example": 0
+          },
+          "account_mnemonic": {
+            "type": "string",
+            "format": "mnemonic",
+            "description": "Account secrete phrases",
+            "example": 0
+          },
+          "sk": {
+            "type": "string",
+            "description": "Wallet private key",
             "example": 0
           }
         }
@@ -613,7 +725,7 @@
           "is-frozen": {
             "type": "boolean",
             "format": "-",
-            "description": "AAsset / token status",
+            "description": "Asset / token status",
             "example": false
           }
         }
