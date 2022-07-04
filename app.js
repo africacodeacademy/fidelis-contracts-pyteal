@@ -92,7 +92,7 @@ app.get(`/wallet/transactions`, walletController.fetchAccountTransactions);
 app.post(`/wallet/send`, walletController.transaferPoints);
 app.get(`/wallets`, walletController.getWallets);
 
-app.get(`/loans/create`, loansController.createLoan);
+app.post(`/loans/create`, loansController.createLoan);
 
 // app.get(`/init`, async (req, res, next) => {
 //   const algosdk = require("algosdk");
