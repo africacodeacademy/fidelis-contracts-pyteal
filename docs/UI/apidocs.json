@@ -378,7 +378,7 @@
       }
     },
     "/loans/create": {
-      "get": {
+      "post": {
         "tags": [
           "Loan"
         ],
@@ -474,12 +474,12 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "reciever_address": {
+                  "receiver_address": {
                     "type": "string",
                     "description": "loan reciever wallet address",
                     "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
                   },
-                  "reciever_staked_points": {
+                  "receiver_staked_points": {
                     "type": "number",
                     "description": "loan reciever points staked again the loan",
                     "example": "25"
@@ -488,6 +488,11 @@
                     "type": "number",
                     "description": "loan amount",
                     "example": "25"
+                  },
+                  "interest_rate": {
+                    "type": "number",
+                    "description": "Percentage Loan interest rate must be between 0 and 100",
+                    "example": "3"
                   },
                   "agent_address": {
                     "type": "string",
@@ -520,13 +525,75 @@
                   }
                 },
                 "required": [
-                  "reciever_address",
-                  "reciever_staked_points",
+                  "receiver_address",
+                  "receiver_staked_points",
                   "loan_amount",
                   "agent_address",
                   "start_date",
                   "end_date",
                   "backers"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans/payment": {
+      "post": {
+        "tags": [
+          "Loan"
+        ],
+        "summary": "Payment",
+        "description": "Endpoint facilitates loan  ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/contract-object"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/contract-object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contract_id": {
+                    "type": "string",
+                    "description": "Contract Id, is a reference to the smart contract the user wants to effect payment on",
+                    "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "loan payment amount",
+                    "example": "25"
+                  },
+                  "agent_address": {
+                    "type": "string",
+                    "description": "agent_address",
+                    "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
+                  }
+                },
+                "required": [
+                  "contract_id",
+                  "amount",
+                  "agent_address"
                 ]
               }
             }
@@ -884,6 +951,102 @@
             "format": "-",
             "description": "Asset / token status",
             "example": false
+          }
+        }
+      },
+      "contract-object": {
+        "type": "object",
+        "properties": {
+          "contract_id": {
+            "type": "string",
+            "format": "string",
+            "description": "Contract Id, is a reference to the smart contract the user wants to effect payment on",
+            "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
+          },
+          "start_date": {
+            "type": "Date",
+            "format": "DateTime Object",
+            "description": "Loan Start Date",
+            "example": ""
+          },
+          "end_date": {
+            "type": "Date",
+            "format": "DateTime Object",
+            "description": "Loan End Date",
+            "example": ""
+          },
+          "loan_amount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "loan payment amount",
+            "example": 1
+          },
+          "interest_rate": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Percentage Loan interest rate must be between 0 and 100",
+            "example": 3
+          },
+          "receiver_address": {
+            "type": "String",
+            "format": "string",
+            "description": "loan reciever wallet address",
+            "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
+          },
+          "receiver_staked_points": {
+            "type": "double",
+            "format": "double",
+            "description": "loan reciever points staked again the loan",
+            "example": 25.6
+          },
+          "amount_payed": {
+            "type": "number",
+            "format": "double",
+            "description": "Loan Amount payed",
+            "example": 25.6
+          },
+          "backers": {
+            "type": "array",
+            "format": "-",
+            "description": "List of backers and backed points",
+            "items": {
+              "$ref": "#/components/schemas/backer-object"
+            }
+          },
+          "balance": {
+            "type": "double",
+            "format": "double",
+            "description": "",
+            "example": "Loan Balance"
+          },
+          "hasDefaulted": {
+            "type": "boolean",
+            "format": "boolean",
+            "description": "Loan default state, true if loan has been defaulted, else false",
+            "example": false
+          },
+          "hasCompleted": {
+            "type": "boolean",
+            "format": "boolean",
+            "description": "Loan completion state, true is loana has been successfully repayed, else false",
+            "example": false
+          }
+        }
+      },
+      "backer-object": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "type": "double",
+            "format": "double",
+            "description": "staked points",
+            "example": 2.5
+          },
+          "address": {
+            "type": "String",
+            "format": "String",
+            "description": "Backer wallet address",
+            "example": "mnabdivy90qonausfyfdt6a"
           }
         }
       }

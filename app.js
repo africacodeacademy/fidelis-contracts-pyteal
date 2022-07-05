@@ -93,6 +93,9 @@ app.post(`/wallet/send`, walletController.transaferPoints);
 app.get(`/wallets`, walletController.getWallets);
 
 app.post(`/loans/create`, loansController.createLoan);
+app.post(`/loans/payment`, loansController.payment);
+// app.post(`/loans/close`, loansController.createLoan);
+// app.post(`/loans/default`, loansController.createLoan);
 
 // app.get(`/init`, async (req, res, next) => {
 //   const algosdk = require("algosdk");
