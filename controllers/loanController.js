@@ -87,7 +87,7 @@ exports.createLoan = async (req, res, next) => {
       end_date,
     } = req.body;
 
-    return res.send({ address: "hgs568i2yyrr6yfa8s7dfavysdtf86" });
+    return res.send({ contract_id: "hgs568i2yyrr6yfa8s7dfavysdtf86" });
   } catch (err) {
     err = errorUtils.errorParser(err);
     res.status(400).send(err);
