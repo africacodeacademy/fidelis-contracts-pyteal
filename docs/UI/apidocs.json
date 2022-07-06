@@ -391,74 +391,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "object"
-                    },
-                    "properties": {
-                      "type": "object",
-                      "properties": {
-                        "address": {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "example": "string"
-                            },
-                            "description": {
-                              "type": "string",
-                              "example": "contract block chain address"
-                            },
-                            "example": {
-                              "type": "string",
-                              "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "xml": {
-                    "name": "main"
-                  }
+                  "$ref": "#/components/schemas/contract-object"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "object"
-                    },
-                    "properties": {
-                      "type": "object",
-                      "properties": {
-                        "address": {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "example": "string"
-                            },
-                            "description": {
-                              "type": "string",
-                              "example": "contract block chain address"
-                            },
-                            "example": {
-                              "type": "string",
-                              "example": "hgs568i2yyrr6yfa8s7dfavysdtf86"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "xml": {
-                    "name": "main"
-                  }
+                  "$ref": "#/components/schemas/contract-object"
                 }
               }
             }
