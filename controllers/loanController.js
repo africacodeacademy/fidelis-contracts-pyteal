@@ -87,7 +87,25 @@ exports.createLoan = async (req, res, next) => {
       end_date,
     } = req.body;
 
-    return res.send({ contract_id: "hgs568i2yyrr6yfa8s7dfavysdtf86" });
+    return res.send({
+      contract_id: "hgs568i2yyrr6yfa8s7dfavysdtf86",
+      start_date: new Date(),
+      end_date: new Date(),
+      loan_amount: 300,
+      interest_rate: 3,
+      amount_payed: 0,
+      receiver_address: "hgs568i2yyrr6yfa8s7dfavysdtf86",
+      receiver_staked_points: 25.6,
+      backers: [
+        {
+          address: "hgs568i2yyrr6yfa8s7dfavysdtf86",
+          points: 25,
+        },
+      ],
+      balance: 300,
+      hasDefaulted: false,
+      hasCompleted: false,
+    });
   } catch (err) {
     err = errorUtils.errorParser(err);
     res.status(400).send(err);
