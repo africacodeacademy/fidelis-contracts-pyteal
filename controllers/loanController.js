@@ -12,62 +12,8 @@ exports.createLoan = async (req, res, next) => {
         required: true,
         "@content": { 
             "application/json": {
-              "schema": {
-                    type: "object",
-                    properties: {
-                        receiver_address: {
-                            type: "string",
-                            description: 'loan reciever wallet address',
-                            example:"hgs568i2yyrr6yfa8s7dfavysdtf86"
-                        },
-                        receiver_staked_points: {
-                            type: "number",
-                            description: 'loan reciever points staked again the loan',
-                            example:"25"
-                        },
-                        loan_amount: {
-                            type: "number",
-                            description: 'loan amount',
-                            example:"25"
-                        },
-                        interest_rate: {
-                            type: "number",
-                            description: 'Percentage Loan interest rate must be between 0 and 100',
-                            example:"3"
-                        },
-                        agent_address: {
-                            type: "string",
-                            description: 'agent_address',
-                            example:"hgs568i2yyrr6yfa8s7dfavysdtf86"
-                        },
-                        start_date: {
-                            type: "Date",
-                            description: 'Valid DateTime object, when the loan starts',
-                        },
-                        end_date: {
-                            type: "Date",
-                            description: 'Valid DateTime object, when the loan ends'
-                        },
-                        backers: {
-                            type: "object",
-                            description: 'List of backer address and respective staked backer points',
-                            properties:{
-                                address: {
-                                    type: "string",
-                                    description: 'backer wallet address',
-                                    example:"hgs568i2yyrr6yfa8s7dfavysdtf86"
-                                },
-                                points: {
-                                    type: "number",
-                                    description: 'backer staked points',
-                                    example:"25"
-                                },
-                            }
-                        },                   
-                                       
-                    },
-                    required: ["receiver_address","receiver_staked_points", "loan_amount", "agent_address", "start_date", "end_date", "backers"]
-                }
+              "schema":  {$ref:'#/components/schemas/contract-creation-object'}
+                
             }
         }        
     }

@@ -472,6 +472,55 @@ const doc = {
           },
         },
       },
+      "contract-creation-object": {
+        type: "object",
+        properties: {
+          receiver_address: {
+            type: "string",
+            description: "loan reciever wallet address",
+            example: "hgs568i2yyrr6yfa8s7dfavysdtf86",
+          },
+          receiver_staked_points: {
+            type: "number",
+            description: "loan reciever points staked again the loan",
+            example: "25",
+          },
+          loan_amount: {
+            type: "number",
+            description: "loan amount",
+            example: "25",
+          },
+          interest_rate: {
+            type: "number",
+            description:
+              "Percentage Loan interest rate must be between 0 and 100",
+            example: "3",
+          },
+          agent_address: {
+            type: "string",
+            description: "agent_address",
+            example: "hgs568i2yyrr6yfa8s7dfavysdtf86",
+          },
+          start_date: {
+            type: "Date",
+            description: "Valid DateTime object, when the loan starts",
+            example: "11/11/2021",
+          },
+          end_date: {
+            type: "Date",
+            description: "Valid DateTime object, when the loan ends",
+            example: "11/11/2022",
+          },
+          backers: {
+            type: "array",
+            format: "-",
+            description: "List of backers and backed points",
+            items: {
+              $ref: "#/components/schemas/backer-object",
+            },
+          },
+        },
+      },
     },
     "@parameters": {
       uniqueIdentifier: {
