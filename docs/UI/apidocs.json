@@ -16,7 +16,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Wallet Object",
+            "description": "Token Object",
             "content": {
               "application/json": {
                 "schema": {
@@ -67,7 +67,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Wallet Object",
+            "description": "Token Object",
             "content": {
               "application/json": {
                 "schema": {
@@ -387,7 +387,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "contract state object",
             "content": {
               "application/json": {
                 "schema": {
@@ -427,7 +427,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Contract state object",
             "content": {
               "application/json": {
                 "schema": {
@@ -834,6 +834,7 @@
       },
       "contract-object": {
         "type": "object",
+        "description": "Contract state object",
         "properties": {
           "contract_id": {
             "type": "string",

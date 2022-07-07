@@ -1,11 +1,11 @@
-const assetsUtils = require("../utils/assets")
-const errorUtils = require("../utils/error")
+const assetsUtils = require("../utils/assets");
+const errorUtils = require("../utils/error");
 /**
  * mintTrustTokensAsset
- * 
+ *
  */
- exports.mintTrustTokensAsset = async(req, res, next) => {
-    /**
+exports.mintTrustTokensAsset = async (req, res, next) => {
+  /**
      * #swagger.tags = ['Fidelis Trust Tokens']
      * #swagger.summary = 'Mint'
      * #swagger.description = 'Endpoint mints new trust token assets'
@@ -29,37 +29,30 @@ const errorUtils = require("../utils/error")
         }        
     }
     #swagger.responses[200] = {
-        description: 'Wallet Object',
+        description: 'Token Object',
         schema: {$ref:'#/components/schemas/token-asset'}
     }  
      */
-    try {  
+  try {
+    const { quantity } = req.body;
 
-        const {
-            quantity
-        } = req.body
+    var assetInfo = await assetsUtils.mintFidelisTrustTokens(quantity);
 
-
-        var assetInfo = await assetsUtils.mintFidelisTrustTokens(quantity)
-
-        return res.send(assetInfo)
-
-    }
-    catch (err) {
-        // console.log("err", err);
-        err = errorUtils.errorParser(err)
-        res.status(500).json({"ERROR": err})
-        // return next(err)
-    }
-}
-
+    return res.send(assetInfo);
+  } catch (err) {
+    // console.log("err", err);
+    err = errorUtils.errorParser(err);
+    res.status(500).json({ ERROR: err });
+    // return next(err)
+  }
+};
 
 /**
  * mintBackerTokensAsset
- * 
+ *
  */
-exports.mintBackerTokensAsset = async(req, res, next) => {
-    /**
+exports.mintBackerTokensAsset = async (req, res, next) => {
+  /**
      * #swagger.tags = ['Fidelis Backer Tokens']
      * #swagger.summary = 'Mint'
      * #swagger.description = 'Endpoint mints new backer token assets'
@@ -83,26 +76,20 @@ exports.mintBackerTokensAsset = async(req, res, next) => {
         }        
     }
     #swagger.responses[200] = {
-        description: 'Wallet Object',
+        description: 'Token Object',
         schema: {$ref:'#/components/schemas/token-asset'}
     }  
      */
-    try {  
+  try {
+    const { quantity } = req.body;
 
-        const {
-            quantity
-        } = req.body
+    var assetInfo = await assetsUtils.mintFidelisBackerTokens(quantity);
 
-
-        var assetInfo = await assetsUtils.mintFidelisBackerTokens(quantity)
-
-        return res.send(assetInfo)
-
-    }
-    catch (err) {
-        console.log("err", err);
-        err = errorUtils.errorParser(err)
-        res.status(500).json({"ERROR": err})
-        // return next(err)
-    }
-}
+    return res.send(assetInfo);
+  } catch (err) {
+    console.log("err", err);
+    err = errorUtils.errorParser(err);
+    res.status(500).json({ ERROR: err });
+    // return next(err)
+  }
+};

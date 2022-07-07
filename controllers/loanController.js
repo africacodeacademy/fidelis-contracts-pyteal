@@ -18,7 +18,7 @@ exports.createLoan = async (req, res, next) => {
         }        
     }
     #swagger.responses[200] = {
-        description: '',
+        description: 'contract state object',
         schema: {$ref:'#/components/schemas/contract-object'}
     }  
      */
@@ -98,7 +98,7 @@ exports.payment = async (req, res, next) => {
         }        
     }
     #swagger.responses[200] = {
-        description: '',
+        description: 'Contract state object',
         schema: {$ref:'#/components/schemas/contract-object'}
     }  
      */

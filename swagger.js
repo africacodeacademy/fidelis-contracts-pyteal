@@ -374,6 +374,7 @@ const doc = {
       },
       "contract-object": {
         type: "object",
+        description: "Contract state object",
         properties: {
           contract_id: {
             type: "string",
