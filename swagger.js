@@ -386,13 +386,13 @@ const doc = {
             type: "Date",
             format: "DateTime Object",
             description: "Loan Start Date",
-            example: "",
+            example: "11/11/2021",
           },
           end_date: {
             type: "Date",
             format: "DateTime Object",
             description: "Loan End Date",
-            example: "",
+            example: "11/11/2022",
           },
           loan_amount: {
             type: "integer",
@@ -443,8 +443,8 @@ const doc = {
           balance: {
             type: "double",
             format: "double",
-            description: "",
-            example: "Loan Balance",
+            description: "Loan Balance",
+            example: 1.2,
           },
           hasDefaulted: {
             type: "boolean",
