@@ -416,7 +416,14 @@ const doc = {
           receiver_staked_points: {
             type: "double",
             format: "double",
-            description: "loan reciever points staked again the loan",
+            description:
+              "loan reciever points / tokens staked against the loan",
+            example: 25.6,
+          },
+          receiver_earned_points: {
+            type: "double",
+            format: "double",
+            description: "loan reciever points / tokens earned",
             example: 25.6,
           },
           amount_payed: {
@@ -461,7 +468,7 @@ const doc = {
           points: {
             type: "double",
             format: "double",
-            description: "staked points",
+            description: "staked points / tokens",
             example: 2.5,
           },
           address: {
@@ -469,6 +476,12 @@ const doc = {
             format: "String",
             description: "Backer wallet address",
             example: "mnabdivy90qonausfyfdt6a",
+          },
+          earned: {
+            type: "double",
+            format: "double",
+            description: "earned points / tokens",
+            example: 2.5,
           },
         },
       },
@@ -482,7 +495,7 @@ const doc = {
           },
           receiver_staked_points: {
             type: "number",
-            description: "loan reciever points staked again the loan",
+            description: "loan reciever points staked against the loan",
             example: "25",
           },
           loan_amount: {

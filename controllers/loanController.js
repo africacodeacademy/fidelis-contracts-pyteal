@@ -42,10 +42,12 @@ exports.createLoan = async (req, res, next) => {
       amount_payed: 0,
       receiver_address: "hgs568i2yyrr6yfa8s7dfavysdtf86",
       receiver_staked_points: 25.6,
+      receiver_earned_points: 30,
       backers: [
         {
           address: "hgs568i2yyrr6yfa8s7dfavysdtf86",
           points: 25,
+          earned: 0,
         },
       ],
       balance: 300,
@@ -112,10 +114,12 @@ exports.payment = async (req, res, next) => {
       amount_payed: 0,
       receiver_address: "hgs568i2yyrr6yfa8s7dfavysdtf86",
       receiver_staked_points: 25.6,
+      receiver_earned_points: 30,
       backers: [
         {
           address: "hgs568i2yyrr6yfa8s7dfavysdtf86",
           points: 25,
+          earned: 30,
         },
       ],
       balance: 300,
