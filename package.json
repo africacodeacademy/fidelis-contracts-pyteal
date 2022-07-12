@@ -36,6 +36,7 @@
     "morgan": "^1.10.0",
     "nodemon": "^2.0.16",
     "npm": "^8.10.0",
+    "ssh-exec": "^2.0.0",
     "swagger-autogen": "^2.21.2",
     "xss-clean": "^0.1.1"
   }
