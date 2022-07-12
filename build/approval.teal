@@ -1,0 +1,195 @@
+#pragma version 5
+txn ApplicationID
+int 0
+==
+bnz main_l23
+txn OnCompletion
+int DeleteApplication
+==
+bnz main_l22
+txn OnCompletion
+int UpdateApplication
+==
+bnz main_l21
+txn OnCompletion
+int OptIn
+==
+bnz main_l18
+txn OnCompletion
+int CloseOut
+==
+bnz main_l17
+txn OnCompletion
+int NoOp
+==
+bnz main_l7
+err
+main_l7:
+txna ApplicationArgs 0
+byte "apply"
+==
+bnz main_l16
+txna ApplicationArgs 0
+byte "payment"
+==
+bnz main_l15
+txna ApplicationArgs 0
+byte "force_close"
+==
+bnz main_l14
+txna ApplicationArgs 0
+byte "check_default"
+==
+bnz main_l12
+err
+main_l12:
+int 1
+return
+main_l13:
+int 0
+return
+main_l14:
+int 1
+return
+main_l15:
+int 1
+return
+main_l16:
+callsub sub2
+b main_l13
+main_l17:
+int 0
+return
+main_l18:
+txna ApplicationArgs 0
+byte "register_agent"
+==
+bnz main_l20
+err
+main_l20:
+int 1
+return
+int 1
+return
+main_l21:
+int 0
+return
+main_l22:
+int 0
+return
+main_l23:
+byte "loan_amount"
+txna ApplicationArgs 1
+app_global_put
+byte "interest_rate"
+txna ApplicationArgs 2
+app_global_put
+byte "start_date"
+txna ApplicationArgs 3
+app_global_put
+byte "end_date"
+txna ApplicationArgs 4
+app_global_put
+byte "reserve_address"
+txna ApplicationArgs 5
+app_global_put
+byte "pool_address"
+txna ApplicationArgs 6
+app_global_put
+int 1
+return
+sub0: // check_txn_conditions
+store 3
+load 3
+gtxns TypeEnum
+int axfer
+==
+load 3
+gtxns AssetReceiver
+global CurrentApplicationAddress
+==
+&&
+load 3
+gtxns AssetCloseTo
+global ZeroAddress
+==
+&&
+retsub
+sub1: // pre_assertions
+global GroupSize
+int 2
+>
+gtxn 1 AssetAmount
+int 1
+>
+&&
+assert
+global GroupSize
+store 0
+byte "beneficiary_stake"
+gtxn 0 AssetAmount
+app_global_put
+byte "beneficiary"
+gtxn 0 AssetSender
+app_global_put
+load 0
+store 2
+int 0
+callsub sub0
+int 0
+==
+bnz sub1_l2
+int 0
+retsub
+sub1_l2:
+int 4
+store 1
+sub1_l3:
+load 1
+load 2
+<=
+bnz sub1_l7
+byte "staked_tokens"
+app_global_get
+byte "loan_amount"
+app_global_get
+!=
+bnz sub1_l6
+int 1
+retsub
+sub1_l6:
+int 0
+retsub
+sub1_l7:
+load 1
+callsub sub0
+int 0
+==
+bnz sub1_l10
+int 0
+return
+sub1_l9:
+load 1
+int 1
++
+store 1
+b sub1_l3
+sub1_l10:
+byte "staked_tokens"
+byte "staked_tokens"
+app_global_get
+load 1
+gtxns AssetAmount
++
+app_global_put
+b sub1_l9
+sub2: // initialize_loan
+callsub sub1
+int 1
+==
+bz sub2_l2
+int 0
+return
+sub2_l2:
+int 1
+return
