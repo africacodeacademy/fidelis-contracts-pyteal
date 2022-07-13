@@ -198,7 +198,9 @@ exports.getWalletTransactions = async (address) => {
     const indexer_port = process.env.INDEXERPORT;
     const algod_token = process.env.ALGOD_TOKEN;
 
-    let indexer = new algosdk.Indexer(algod_token, algod_server, indexer_port);
+    let indexer = new algosdk.Indexer(algod_token, algod_server, indexer_port, {
+      "x-api-key": algod_token,
+    });
     let transactions = await indexer.lookupAccountTransactions(address).do();
 
     return transactions;
