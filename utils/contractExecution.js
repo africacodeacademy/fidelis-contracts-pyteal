@@ -2,6 +2,8 @@ const { exec } = require("child_process");
 
 const OPERATIONS = require("../constants/operations")
 
+let algo_base = process.env.ALGO_NODE_BASE_DIR;
+
 
 class Executer{
 
@@ -19,7 +21,7 @@ class Executer{
 
     getCommand()
     {
-        this.command = "node --version"; // Think of a better default
+        this.command = "echo $USER"; // Think of a better default
         switch(this.operation)
         {
             case OPERATIONS.INIT_LOAN:
@@ -35,7 +37,8 @@ class Executer{
 
     buildLoanInit()
     {
-        return "ls -la";
+        return `cd ${algo_base} && \
+         ls -la`;
     }
 
     execute()
@@ -56,6 +59,23 @@ class Executer{
 };
 
 
-let executer = new Executer("Olebogeng", OPERATIONS.INIT_LOAN);
+
+let data = {
+    receiver_address: "hgs568i2yyrr6yfa8s7dfavysdtf86",
+    receiver_staked_points: "25",
+    loan_amount: "25",
+    interest_rate: "3",
+    agent_address: "hgs568i2yyrr6yfa8s7dfavysdtf86",
+    start_date: "11/11/2021",
+    end_date: "11/11/2022",
+    backers: [
+        {
+        "points": 2.5,
+        "address": "mnabdivy90qonausfyfdt6a",
+        "earned": 2.5
+        }
+        ]
+    }
+let executer = new Executer(data, OPERATIONS.INIT_LOAN);
 
 executer.execute();
