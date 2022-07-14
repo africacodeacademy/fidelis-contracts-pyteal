@@ -110,7 +110,7 @@ def approval():
     )
 
     register_agent = Seq(
-        # App.globalPut(agent_address, Txn.application_args[0]),
+        # App.globalPut(agent_address, Txn.accounts[1]),
         Approve()
     )
 
@@ -153,7 +153,8 @@ def approval():
                     TxnField.type_enum: TxnType.AssetTransfer,
                     TxnField.asset_receiver: App.globalGet(Bytes("agent_address")),
                     TxnField.asset_amount: App.globalGet(Bytes("loan_amount")),
-                    TxnField.xfer_asset: Txn.assets[0]
+                    TxnField.xfer_asset: Txn.assets[0],
+                    TxnField.asset_sender: App.globalGet(Bytes("pool_address"))
                 }
             ),
             InnerTxnBuilder.Submit(),

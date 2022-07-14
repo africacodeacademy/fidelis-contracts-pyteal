@@ -214,5 +214,8 @@ app_global_get
 itxn_field AssetAmount
 txna Assets 0
 itxn_field XferAsset
+byte "pool_address"
+app_global_get
+itxn_field AssetSender
 itxn_submit
 retsub
