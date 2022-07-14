@@ -37,8 +37,9 @@ class Executer{
 
     buildLoanInit()
     {
-        return `cd ${algo_base} && \
-         ls -la`;
+        return `cd ../sandbox && ./sandbox goal app create --creator ET53JRVUL26PVAJOMBFSTVQBDBBRRYCTR4KGSQOTXUISIZIWEQAU4CGQRI \
+        --approval-prog approval.teal --clear-prog clear.teal --global-byteslices 0 \
+        --global-ints 0 --local-byteslices 3 --local-ints 1`;
     }
 
     execute()
