@@ -134,7 +134,7 @@ def approval():
         Approve()
     )
 
-    #incomplete
+    #needs testing
     @Subroutine(TealType.none)
     def initialize_loan():
         return Seq(
@@ -144,9 +144,21 @@ def approval():
                     Reject()
                 )
             ),
-            #TODO: execute transactions, move tokens from benefitiary address and backer addresses to escrow address, move USDCa to agent address
+            #update loan balance
+            App.globalPut(balance,  App.globalGet(Bytes("loan_amount"))+ (App.globalGet(Bytes("loan_amount")) * (App.globalGet(Bytes("interest_rate"))/Int(100)))),
+            # move USDCa to agent address
+            InnerTxnBuilder.Begin(),
+            InnerTxnBuilder.SetFields(
+                {
+                    TxnField.type_enum: TxnType.AssetTransfer,
+                    TxnField.asset_receiver: App.globalGet(Bytes("agent_address")),
+                    TxnField.asset_amount: App.globalGet(Bytes("loan_amount")),
+                    TxnField.xfer_asset: Txn.assets[0]
+                }
+            ),
+            InnerTxnBuilder.Submit(),
 
-            Approve()
+            # Approve()
         )
     
     

@@ -191,5 +191,28 @@ bz sub2_l2
 int 0
 return
 sub2_l2:
-int 1
-return
+byte "balance"
+byte "loan_amount"
+app_global_get
+byte "loan_amount"
+app_global_get
+byte "interest_rate"
+app_global_get
+int 100
+/
+*
++
+app_global_put
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "agent_address"
+app_global_get
+itxn_field AssetReceiver
+byte "loan_amount"
+app_global_get
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+itxn_submit
+retsub
