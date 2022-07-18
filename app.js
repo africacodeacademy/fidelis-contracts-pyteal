@@ -42,6 +42,9 @@ app.use(
 );
 
 app.use(logger("dev"));
+
+app.use(session({ secret: process.env.SESSION_SECRET ?? 'testsecret' })); //implementation in session deprecated
+
 app.use(xss());
 
 //sanitize requests against special chars, some precaution against NoSQL Injection Attacks
