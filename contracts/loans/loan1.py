@@ -15,7 +15,7 @@ def approval():
     reserve_address = Bytes("reserve_address")
     # admin_address = Bytes("admin_address")
     agent_address = Bytes("agent_address"),
-    assetId = Bytes("agent_address")
+    assetId = Bytes("assetId")
     pool_address = Bytes("pool_address")
     staked_tokens = Bytes("staked_tokens")
 
