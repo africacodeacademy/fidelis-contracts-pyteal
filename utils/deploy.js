@@ -4,21 +4,19 @@ const dotenv = require("dotenv");
 
 
 const baseServer = process.env.ALGODSERVER;
-const port = process.env.ALGODPORT;;
-const token = {
-    'X-API-Key': process.env.ALGOD_TOKEN
-}
+const port = process.env.ALGODPORT;
+let algod_token = process.env.ALGOD_TOKEN
+
 dotenv.config({
     path: ".env",
   });
   
-
-const algodClient = new algosdk.Algodv2(token, baseServer, port); 
+const algodClient = new algosdk.Algodv2(algod_token, baseServer, port, { "x-api-key": algod_token }); 
 
 //let myaccount = algosdk.mnemonicToSecretKey(process.env.ACCOUNT_MNEMONIC);
 //let sender = myaccount.addr;
 let sender = process.env.ADMIN_ADDRESS;
-console.log(sender)
+
 
 
 async function compileProgram(client, TealSource) {
@@ -31,7 +29,7 @@ async function compileProgram(client, TealSource) {
 
 
 exports.initialize = async () => {
-    console.log(process.env.APPROVAL_TEAL_SOURCE)
+
     try {
         const localInts = 0
         const localBytes = 0
