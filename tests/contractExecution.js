@@ -1,6 +1,6 @@
 const { exec } = require("child_process");
 
-const OPERATIONS = require("../../constants/operations")
+const OPERATIONS = require("../constants/operations")
 
 let algo_base = process.env.ALGO_NODE_BASE_DIR;
 
@@ -48,10 +48,10 @@ class Executer{
         --app-arg "str:123434532" \
         --app-arg "str:32342342" \
         --app-account "XWR4JW3C4P5O4XSWTQTWG5LQHLYW66QKH3K2LWYEFQLCUHWGIGLVZUU6H4" \
-        --app-account "7C5J5IK273NQ5R2LCHWIITBH7N6DLBG2WA4I3EPCDJ3LU72PIJXJHGQCX4" 
-        --global-byteslices 12
-        --global-ints 0
-        --local-ints 0
+        --app-account "7C5J5IK273NQ5R2LCHWIITBH7N6DLBG2WA4I3EPCDJ3LU72PIJXJHGQCX4" \
+        --global-byteslices 12 \
+        --global-ints 0 \
+        --local-ints 0 \
         --local-byteslices 0`;
     }
 
