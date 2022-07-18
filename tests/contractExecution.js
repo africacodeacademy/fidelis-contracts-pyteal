@@ -1,4 +1,6 @@
 const { exec } = require("child_process");
+require('dotenv').config()
+
 
 const OPERATIONS = require("../constants/operations")
 
