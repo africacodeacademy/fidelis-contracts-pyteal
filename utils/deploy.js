@@ -1,20 +1,24 @@
-import dotenv from "dotenv";
-import algosdk from "algosdk";
-import {
-    open, readFile
-  } from 'node:fs/promises';
-dotenv.config();
+const algosdk = require("algosdk");
+const fs = require('fs/promises');
+const dotenv = require("dotenv");
 
-const baseServer = 'https://testnet-algorand.api.purestake.io/ps2'
-const port = '';
+
+const baseServer = process.env.ALGODSERVER;
+const port = process.env.ALGODPORT;;
 const token = {
-    'X-API-Key': process.env.API_KEY
+    'X-API-Key': process.env.ALGOD_TOKEN
 }
+dotenv.config({
+    path: ".env",
+  });
+  
 
 const algodClient = new algosdk.Algodv2(token, baseServer, port); 
 
-let myaccount = algosdk.mnemonicToSecretKey(process.env.ACCOUNT_MNEMONIC);
-let sender = myaccount.addr;
+//let myaccount = algosdk.mnemonicToSecretKey(process.env.ACCOUNT_MNEMONIC);
+//let sender = myaccount.addr;
+let sender = process.env.ADMIN_ADDRESS;
+console.log(sender)
 
 
 async function compileProgram(client, TealSource) {
@@ -26,7 +30,8 @@ async function compileProgram(client, TealSource) {
 }
 
 
-expoerts.initialize = async () => {
+exports.initialize = async () => {
+    console.log(process.env.APPROVAL_TEAL_SOURCE)
     try {
         const localInts = 0
         const localBytes = 0
@@ -36,8 +41,8 @@ expoerts.initialize = async () => {
         
         let start_date = "123434532";
         let end_date = "32342342";
-        let loan_amount = 50;
-        let interest = 1
+        let loan_amount = "50";
+        let interest = "1"
         let appArgs1 = [];
         let appArgs2 = [];
         let appArgs3 = [];
@@ -52,11 +57,11 @@ expoerts.initialize = async () => {
         args.push(appArgs1, appArgs2, appArgs3, appArgs4);
         let accounts = ["XWR4JW3C4P5O4XSWTQTWG5LQHLYW66QKH3K2LWYEFQLCUHWGIGLVZUU6H4", "7C5J5IK273NQ5R2LCHWIITBH7N6DLBG2WA4I3EPCDJ3LU72PIJXJHGQCX4"];
 
-        let approvalProgramfile = await open(process.env.APPROVAL_TEAL_SOURCE);
-        let clearProgramfile = await open(process.env.CLEAR_TEAL_SOURCE);
+        //let approvalProgramfile = await open(process.env.APPROVAL_TEAL_SOURCE);
+        //let clearProgramfile = await open(process.env.CLEAR_TEAL_SOURCE);
 
-        const approvalProgram = await approvalProgramfile.readFile();
-        const clearProgram = await clearProgramfile.readFile();
+        const approvalProgram = await fs.readFile(process.env.APPROVAL_TEAL_SOURCE, { encoding: 'utf8' });
+        const clearProgram = await fs.readFile(process.env.CLEAR_TEAL_SOURCE)
 
         const approvalProgramBinary = await compileProgram(algodClient, approvalProgram);
         const clearProgramBinary = await compileProgram(algodClient, clearProgram);
@@ -73,7 +78,7 @@ expoerts.initialize = async () => {
         let txId = txn.txID().toString();
 
         // Sign the transaction
-        let signedTxn = txn.signTxn(myaccount.sk);
+        //let signedTxn = txn.signTxn(myaccount.sk);
         console.log("Signed transaction with txID: %s", txId);
 
         // Submit the transaction
@@ -92,4 +97,4 @@ expoerts.initialize = async () => {
   }
 }
 
-initialize();
+exports.initialize();
