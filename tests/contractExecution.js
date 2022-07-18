@@ -37,7 +37,7 @@ class Executer{
 
     buildLoanInit()
     {
-        return `cd ../sandbox && ./sandbox goal app create \
+        return `cd ${algo_base} && ./sandbox goal app create \
         --creator "M4W7RNEGZXIUFTVVSTCTALUCDSVT3IZQY73GTXU4DCI4U2YHXR2JCR6WHA" \
         --approval-prog "approval.teal" \
         --clear-prog "clear.teal" \
