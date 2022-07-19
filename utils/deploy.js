@@ -29,7 +29,7 @@ async function compileProgram(client, TealSource) {
 }
 
 
-exports.initialize = async (params) => {
+exports.initialize = async (txn_inputs) => {
  
     let response_obj = {
         'success': false
@@ -41,10 +41,10 @@ exports.initialize = async (params) => {
         const globalBytes = 12
 
         let op = "apply";
-        let start_date = params.start_date;
-        let end_date = params.end_date;
-        let loan_amount = params.loan_amount;
-        let interest = params.interest_rate;
+        let start_date = txn_inputs.start_date;
+        let end_date = txn_inputs.end_date;
+        let loan_amount = txn_inputs.loan_amount;
+        let interest = txn_inputs.interest_rate;
         let args = [];
         
         args.push(new Uint8Array(Buffer.from(op)));
