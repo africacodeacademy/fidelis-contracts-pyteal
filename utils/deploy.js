@@ -38,10 +38,10 @@ exports.initialize = async () => {
         const globalBytes = 12
 
         
-        let start_date = "str:123434532";
-        let end_date = "str:32342342";
-        let loan_amount = "str:50";
-        let interest = "str:1"
+        let start_date = "123434532";
+        let end_date = "32342342";
+        let loan_amount = "50";
+        let interest = "1"
         let args = []
         args.push(new Uint8Array(Buffer.from(loan_amount)));
         args.push(new Uint8Array(Buffer.from(interest)));
