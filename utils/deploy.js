@@ -114,4 +114,4 @@ exports.initialize = async () => {
         return response_obj;
 }
 
-console.log(exports.initialize());
+console.log(await exports.initialize());
