@@ -38,22 +38,16 @@ exports.initialize = async () => {
         const globalBytes = 12
 
         
-        let start_date = "123434532";
-        let end_date = "32342342";
-        let loan_amount = "50";
-        let interest = "1"
-        let appArgs1 = [];
-        let appArgs2 = [];
-        let appArgs3 = [];
-        let appArgs4 = [];
-
-        appArgs1.push(new Uint8Array(Buffer.from(loan_amount)));
-        appArgs2.push(new Uint8Array(Buffer.from(interest)));
-        appArgs3.push(new Uint8Array(Buffer.from(start_date)));
-        appArgs4.push(new Uint8Array(Buffer.from(end_date)));
-
-        let args = [];
-        args.push(appArgs1, appArgs2, appArgs3, appArgs4);
+        let start_date = "str:123434532";
+        let end_date = "str:32342342";
+        let loan_amount = "str:50";
+        let interest = "str:1"
+        let args = []
+        args.push(new Uint8Array(Buffer.from(loan_amount)));
+        args.push(new Uint8Array(Buffer.from(interest)));
+        args.push(new Uint8Array(Buffer.from(start_date)));
+        args.push(new Uint8Array(Buffer.from(end_date)));
+        
         let accounts = ["XWR4JW3C4P5O4XSWTQTWG5LQHLYW66QKH3K2LWYEFQLCUHWGIGLVZUU6H4", "7C5J5IK273NQ5R2LCHWIITBH7N6DLBG2WA4I3EPCDJ3LU72PIJXJHGQCX4"];
 
         //let approvalProgramfile = await open(process.env.APPROVAL_TEAL_SOURCE);
@@ -77,7 +71,8 @@ exports.initialize = async () => {
         let txId = txn.txID().toString();
 
         // Sign the transaction
-        //let signedTxn = txn.signTxn(myaccount.sk);
+        let sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
+        let signedTxn = txn.signTxn(sk);
         console.log("Signed transaction with txID: %s", txId);
 
         // Submit the transaction
