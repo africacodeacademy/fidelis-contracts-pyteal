@@ -3,15 +3,16 @@ const fs = require('fs/promises');
 const dotenv = require("dotenv");
 
 
-const baseServer = process.env.ALGODSERVER;
-const port = process.env.ALGODPORT;
-let algod_token = process.env.ALGOD_TOKEN
-
 dotenv.config({
     path: ".env",
   });
-  
-const algodClient = new algosdk.Algodv2(algod_token, baseServer, port, { "x-api-key": algod_token }); 
+
+const baseServer = process.env.ALGODSERVER;
+const port = process.env.ALGODPORT;
+let algod_token = process.env.ALGOD_TOKEN
+let headers = { "x-api-key": algod_token };
+
+const algodClient = new algosdk.Algodv2(algod_token, baseServer, headers); 
 
 //let myaccount = algosdk.mnemonicToSecretKey(process.env.ACCOUNT_MNEMONIC);
 //let sender = myaccount.addr;
