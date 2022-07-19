@@ -94,12 +94,13 @@ exports.initialize = async () => {
             // If network request, display verbose error
             if (err.response) {
 
-                response_obj.push(
-                    ...{
-                        'message': err.response.text.message,
-                        'status': err.response.status,
-                         'description': 'Network request unsuccessful'
-                    });
+                response_obj.append(
+                    [
+                        {'message': err.response.text.message},
+                        {'status': err.response.status},
+                        {'description': 'Network request unsuccessful'}
+                    ]
+                );
 
             }
 
