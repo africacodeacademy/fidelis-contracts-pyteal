@@ -16,7 +16,7 @@ const algodClient = new algosdk.Algodv2(algod_token, baseServer, port, headers);
 
 //let myaccount = algosdk.mnemonicToSecretKey(process.env.ACCOUNT_MNEMONIC);
 //let sender = myaccount.addr;
-let sender = process.env.ADMIN_ADDRESS;
+let sender = process.env.TOKEN_RESERVE_ADDRESS;
 
 
 
