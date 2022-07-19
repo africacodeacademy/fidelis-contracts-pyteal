@@ -31,9 +31,9 @@ async function compileProgram(client, TealSource) {
 
 exports.initialize = async () => {
  
-    let response_obj = [{
+    let response_obj = {
         'success': false
-    }];
+    };
     try {
         const localInts = 0
         const localBytes = 0
@@ -94,14 +94,12 @@ exports.initialize = async () => {
             // If network request, display verbose error
             if (err.response) {
 
-                response_obj.append(
-                    [
-                        {'message': err.response.text.message},
-                        {'status': err.response.status},
-                        {'description': 'Network request unsuccessful'}
-                    ]
-                );
-
+                response_obj = {
+                    ...{'message': err.response.text.message},
+                    ...{'status': err.response.status},
+                    ...{'description': 'Network request unsuccessful'}
+                }
+                
             }
 
             else
