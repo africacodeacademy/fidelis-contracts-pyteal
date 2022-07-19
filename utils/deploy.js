@@ -95,8 +95,8 @@ exports.initialize = async () => {
             if (err.response) {
 
                 response_obj.push(
-                    {
-                        'message': err.response.text, 
+                    ...{
+                        'message': err.response.text.message,
                         'status': err.response.status,
                          'description': 'Network request unsuccessful'
                     });
