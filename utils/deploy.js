@@ -37,12 +37,14 @@ exports.initialize = async () => {
         const globalInts = 0
         const globalBytes = 12
 
-        
+        let op = "apply";
         let start_date = "123434532";
         let end_date = "32342342";
         let loan_amount = "50";
         let interest = "1"
         let args = []
+        
+        args.push(new Uint8Array(Buffer.from(op)));
         args.push(new Uint8Array(Buffer.from(loan_amount)));
         args.push(new Uint8Array(Buffer.from(interest)));
         args.push(new Uint8Array(Buffer.from(start_date)));
