@@ -31,9 +31,9 @@ async function compileProgram(client, TealSource) {
 
 exports.initialize = async () => {
  
-    let response_obj = {
+    let response_obj = [{
         'success': false
-    };
+    }];
     try {
         const localInts = 0
         const localBytes = 0
