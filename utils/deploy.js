@@ -29,7 +29,7 @@ async function compileProgram(client, TealSource) {
 }
 
 
-exports.initialize = async () => {
+exports.initialize = async (params) => {
  
     let response_obj = {
         'success': false
@@ -41,11 +41,11 @@ exports.initialize = async () => {
         const globalBytes = 12
 
         let op = "apply";
-        let start_date = "123434532";
-        let end_date = "32342342";
-        let loan_amount = "50";
-        let interest = "1"
-        let args = []
+        let start_date = params.start_date;
+        let end_date = params.end_date;
+        let loan_amount = params.loan_amount;
+        let interest = params.interest_rate;
+        let args = [];
         
         args.push(new Uint8Array(Buffer.from(op)));
         args.push(new Uint8Array(Buffer.from(loan_amount)));
@@ -111,6 +111,23 @@ exports.initialize = async () => {
         return response_obj;
 }
 
-exports.initialize().then((data)=>{
+
+let params = {
+    "receiver_address": "hgs568i2yyrr6yfa8s7dfavysdtf86",
+    "receiver_staked_points": "25",
+    "loan_amount": "50",
+    "interest_rate": "1",
+    "agent_address": "hgs568i2yyrr6yfa8s7dfavysdtf86",
+    "start_date": "123434532",
+    "end_date": "32342342",
+    "backers": [
+        {
+        "points": 2.5,
+        "address": "mnabdivy90qonausfyfdt6a",
+        "earned": 2.5
+        }
+    ]
+    }
+    exports.initialize(params).then((data)=>{
     console.log(data);
 })
