@@ -12,7 +12,7 @@ const port = process.env.ALGODPORT;
 let algod_token = process.env.ALGOD_TOKEN
 let headers = { "x-api-key": algod_token };
 
-const algodClient = new algosdk.Algodv2(algod_token, baseServer, headers); 
+const algodClient = new algosdk.Algodv2(algod_token, baseServer, port, headers); 
 
 //let myaccount = algosdk.mnemonicToSecretKey(process.env.ACCOUNT_MNEMONIC);
 //let sender = myaccount.addr;
