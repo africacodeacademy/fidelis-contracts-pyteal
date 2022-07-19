@@ -85,10 +85,17 @@ exports.initialize = async () => {
         let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
         let appId = transactionResponse['application-index'];
         console.log("Created new with app-id: ",appId);
-} catch (err) {
-    console.error("Failed to deploy!", err);
-    process.exit(1);
-  }
+        } catch (err) {
+            // If network request, display verbose error
+            if (err.response) {
+            throw new Error(
+                `Network request unsuccessful. Received status ${err.response.status}: ${err.response.text}`
+            );
+            }
+
+            // Otherwise throw the error normally
+            throw err;
+        }
 }
 
 exports.initialize();
