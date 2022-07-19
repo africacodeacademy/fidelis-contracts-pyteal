@@ -86,6 +86,7 @@ const MongoDBConnect = require("./utils/db.js");
 const walletController = require("./controllers/walletController");
 const assetController = require("./controllers/assetController");
 const loansController = require("./controllers/loanController");
+const testRoutes = require("./tests/testRoutes");
 
 app.post(`/mint/trusttokens`, assetController.mintTrustTokensAsset);
 app.post(`/mint/backertokens`, assetController.mintBackerTokensAsset);
@@ -97,6 +98,8 @@ app.get(`/wallets`, walletController.getWallets);
 
 app.post(`/loans/create`, loansController.createLoan);
 app.post(`/loans/payment`, loansController.payment);
+app.use(`/testRoutes`, testRoutes);
+
 // app.post(`/loans/close`, loansController.createLoan);
 // app.post(`/loans/default`, loansController.createLoan);
 

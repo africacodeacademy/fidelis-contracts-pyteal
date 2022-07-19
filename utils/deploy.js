@@ -103,6 +103,7 @@ exports.initialize = async (txn_inputs) => {
             else
             {
                 //TODO: Handle errors unrelated to network
+                response_obj['description']= 'Could not deploy contract';
                 console.log(err);
 
             }
@@ -110,24 +111,3 @@ exports.initialize = async (txn_inputs) => {
 
         return response_obj;
 }
-
-
-let params = {
-    "receiver_address": "hgs568i2yyrr6yfa8s7dfavysdtf86",
-    "receiver_staked_points": "25",
-    "loan_amount": "50",
-    "interest_rate": "1",
-    "agent_address": "hgs568i2yyrr6yfa8s7dfavysdtf86",
-    "start_date": "123434532",
-    "end_date": "32342342",
-    "backers": [
-        {
-        "points": 2.5,
-        "address": "mnabdivy90qonausfyfdt6a",
-        "earned": 2.5
-        }
-    ]
-    }
-    exports.initialize(params).then((data)=>{
-    console.log(data);
-})
