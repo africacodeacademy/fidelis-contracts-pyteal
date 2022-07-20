@@ -52,6 +52,8 @@ exports.initialize = async (txn_inputs) => {
         args.push(new Uint8Array(Buffer.from(interest)));
         args.push(new Uint8Array(Buffer.from(start_date)));
         args.push(new Uint8Array(Buffer.from(end_date)));
+        args.push(new Uint8Array(Buffer.from("XWR4JW3C4P5O4XSWTQTWG5LQHLYW66QKH3K2LWYEFQLCUHWGIGLVZUU6H4")));
+        args.push(new Uint8Array(Buffer.from("7C5J5IK273NQ5R2LCHWIITBH7N6DLBG2WA4I3EPCDJ3LU72PIJXJHGQCX4")));
         
         let accounts = ["XWR4JW3C4P5O4XSWTQTWG5LQHLYW66QKH3K2LWYEFQLCUHWGIGLVZUU6H4", "7C5J5IK273NQ5R2LCHWIITBH7N6DLBG2WA4I3EPCDJ3LU72PIJXJHGQCX4"];
 
