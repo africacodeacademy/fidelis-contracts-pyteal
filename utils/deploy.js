@@ -92,6 +92,11 @@ exports.initialize = async (txn_inputs) => {
         let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
         let appId = transactionResponse['application-index'];
         console.log("Created new with app-id: ",appId);
+
+        response_obj['success'] = true;
+        response_obj['contract_id'] = appId;
+        response_obj['description'] = 'Successfully deployed contract';
+
         } catch (err) {
             // If network request, display verbose error
             if (err.response) {
