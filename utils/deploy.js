@@ -45,6 +45,8 @@ exports.initialize = async (txn_inputs) => {
         let end_date = txn_inputs.end_date;
         let loan_amount = txn_inputs.loan_amount;
         let interest = txn_inputs.interest_rate;
+        let reserve_address = "XWR4JW3C4P5O4XSWTQTWG5LQHLYW66QKH3K2LWYEFQLCUHWGIGLVZUU6H4";
+        let pool_address = "7C5J5IK273NQ5R2LCHWIITBH7N6DLBG2WA4I3EPCDJ3LU72PIJXJHGQCX4";
         let args = [];
         
         args.push(new Uint8Array(Buffer.from(op)));
@@ -52,8 +54,8 @@ exports.initialize = async (txn_inputs) => {
         args.push(new Uint8Array(Buffer.from(interest)));
         args.push(new Uint8Array(Buffer.from(start_date)));
         args.push(new Uint8Array(Buffer.from(end_date)));
-        args.push(new Uint8Array(Buffer.from("XWR4JW3C4P5O4XSWTQTWG5LQHLYW66QKH3K2LWYEFQLCUHWGIGLVZUU6H4")));
-        args.push(new Uint8Array(Buffer.from("7C5J5IK273NQ5R2LCHWIITBH7N6DLBG2WA4I3EPCDJ3LU72PIJXJHGQCX4")));
+        args.push(new Uint8Array(Buffer.from(reserve_address)));
+        args.push(new Uint8Array(Buffer.from(pool_address)));
         
         let accounts = ["XWR4JW3C4P5O4XSWTQTWG5LQHLYW66QKH3K2LWYEFQLCUHWGIGLVZUU6H4", "7C5J5IK273NQ5R2LCHWIITBH7N6DLBG2WA4I3EPCDJ3LU72PIJXJHGQCX4"];
 
@@ -91,7 +93,7 @@ exports.initialize = async (txn_inputs) => {
         // print the app-id
         let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
         let appId = transactionResponse['application-index'];
-        console.log("Created new with app-id: ",appId);
+        console.log("Created new app with app-id: ",appId);
 
         response_obj['success'] = true;
         response_obj['contract_id'] = appId;
