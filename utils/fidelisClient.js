@@ -76,7 +76,7 @@ class FidelisClient
 
             console.log("Applying for loan. . . . ");
     
-            let txn = algosdk.makeApplicationNoOpTxn(sender, params, this.contract_id, appArgs=args, foreignAssets=assets);
+            let txn = algosdk.makeApplicationNoOpTxn(sender, params, this.contract_id, args,[],[], assets);
 
             let txId = txn.txID().toString();
     
