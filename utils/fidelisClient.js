@@ -30,7 +30,7 @@ async function compileProgram(client, TealSource) {
 
 
 
-class FidelisClient
+class FidelisContracts
 {
     constructor()
     {
@@ -69,7 +69,7 @@ class FidelisClient
         try
         {
             let op = "apply";
-            let assets = [10];
+            let assets = [95615734, 95615934];
             let args = [];
             args.push(new Uint8Array(Buffer.from(op)));
             let params = await algodClient.getTransactionParams().do();
@@ -245,9 +245,9 @@ let params = {
     ]
 }
 
-let fidelisClient = new FidelisClient();
+let fidelisContracts = new FidelisContracts();
 
-fidelisClient.initiate(params).then((data)=>{
+fidelisContracts.initiate(params).then((data)=>{
     console.log(data);
 })
 
