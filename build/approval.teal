@@ -52,10 +52,10 @@ main_l14:
 int 1
 return
 main_l15:
-int 1
-return
-main_l16:
 callsub sub2
+b main_l13
+main_l16:
+callsub sub3
 b main_l13
 main_l17:
 int 0
@@ -183,14 +183,43 @@ gtxns AssetAmount
 +
 app_global_put
 b sub1_l9
-sub2: // initialize_loan
+sub2: // payment
+txna ApplicationArgs 1
+btoi
+byte "balance"
+app_global_get
+<=
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "pool_address"
+app_global_get
+itxn_field AssetReceiver
+txna ApplicationArgs 1
+btoi
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+txn Sender
+itxn_field AssetSender
+itxn_submit
+byte "balance"
+byte "balance"
+app_global_get
+txna ApplicationArgs 1
+btoi
+-
+app_global_put
+retsub
+sub3: // initialize_loan
 callsub sub1
 int 1
 ==
-bz sub2_l2
+bz sub3_l2
 int 0
 return
-sub2_l2:
+sub3_l2:
 byte "balance"
 byte "loan_amount"
 app_global_get

@@ -15,7 +15,7 @@ def approval():
     reserve_address = Bytes("reserve_address")
     # admin_address = Bytes("admin_address")
     agent_address = Bytes("agent_address"),
-    assetId = Bytes("assetId")
+    assetId = Bytes("agent_address")
     pool_address = Bytes("pool_address")
     staked_tokens = Bytes("staked_tokens")
 
@@ -97,13 +97,31 @@ def approval():
         )
 
 
+
+    @Subroutine(TealType.none)
+    def payment():
+        return Seq(
+                # run custom logic
+                #TODO:: Check if agent address has the required amount
+                #make sure balance doesnt go below zero
+                Assert(Btoi(Txn.application_args[1]) <= App.globalGet(balance)),
+                #move USDCa from agent to pool address
+                InnerTxnBuilder.Begin(),
+                InnerTxnBuilder.SetFields(
+                    {
+                        TxnField.type_enum: TxnType.AssetTransfer,
+                        TxnField.asset_receiver: App.globalGet(Bytes("pool_address")),
+                        TxnField.asset_amount: Btoi(Txn.application_args[1]), #amount
+                        TxnField.xfer_asset: Txn.assets[0],
+                        TxnField.asset_sender: Txn.sender() #agent address
+                    }
+                ),
+                InnerTxnBuilder.Submit(),
+                #reduce balance
+                App.globalPut(Bytes("balance"), App.globalGet(Bytes("balance")) - Btoi(Txn.application_args[1])),
+            )
+
     # expressions
-
-    payment = Seq(
-        # run custom logic
-        Approve(),
-    )
-
     force_close = Seq(
     #  run custom logic
         Approve(),
@@ -176,7 +194,7 @@ def approval():
         no_op=Seq(
             Cond(
                 [Txn.application_args[0] == Bytes("apply"), initialize_loan()],
-                [Txn.application_args[0] == Bytes("payment"), payment],
+                [Txn.application_args[0] == Bytes("payment"), payment()],
                 [Txn.application_args[0] == Bytes("force_close"), force_close],
                 [Txn.application_args[0] == Bytes("check_default"), check_default]
             ),
