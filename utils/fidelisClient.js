@@ -46,6 +46,77 @@ class FidelisContracts
         this.contract_id = contract_id;
     }
 
+    async registerAgent(txn_inputs)
+    {
+        let response_obj = {
+            'success': false
+        };
+
+        let response = await this.deploy(txn_inputs);
+        this.contract_id = response.contract_id ?? null;
+
+        if(!this.contract_id)
+        {
+            return response;
+        }
+        try{
+            let op = "register_agent";
+
+            let accounts = [sender, txn_inputs.agent_address];
+            let args = [];
+            args.push(new Uint8Array(Buffer.from(op)));
+            let params = await algodClient.getTransactionParams().do();
+
+            console.log("Registering Agent. . . . ");
+            let  txn = algosdk.makeApplicationOptInTxn(sender, params, this.contract_id, args, accounts);
+
+            let txId = txn.txID().toString();
+    
+            // Sign the transaction
+            let sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
+            let signedTxn = txn.signTxn(sk);
+            console.log("Signed transaction with txID: %s", txId);
+    
+            // Submit the transaction
+            await algodClient.sendRawTransaction(signedTxn).do();
+    
+            // Wait for confirmation
+            await algosdk.waitForConfirmation(algodClient, txId, 2);
+    
+            // print the app-id
+            let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
+            let appId = transactionResponse['application-index'];
+            console.log("Registered agent for app-id: ",appId);
+    
+            response_obj['success'] = true;
+            response_obj['contract_id'] = appId;
+            response_obj['description'] = 'Successfully registered agent';
+    
+            } 
+            
+            catch (err) {
+                // If network request, display verbose error
+                if (err.response) {
+    
+                    response_obj['message'] = err.response.text;
+                    response_obj['status'] = err.response.status
+                    response_obj['description']= 'Network request unsuccessful';
+                    
+                }
+    
+                else
+                {
+                    //TODO: Handle errors unrelated to network
+                    response_obj['description']= 'Could not register agent';
+                    console.log(err);
+    
+                }
+            }
+
+            return response_obj;
+        
+    }
+
 
     /**
      * 
@@ -69,24 +140,27 @@ class FidelisContracts
         try
         {
             let op = "apply";
-            let assets = [95615734, 95615934];
+            let assets = [10458941, 95615734, 95615934];
             let args = [];
             args.push(new Uint8Array(Buffer.from(op)));
             let params = await algodClient.getTransactionParams().do();
 
             console.log("Applying for loan. . . . ");
     
-            let txn = algosdk.makeApplicationNoOpTxn(sender, params, this.contract_id, args,[],[], assets);
+            let txn1 = algosdk.makeApplicationNoOpTxn(sender, params, this.contract_id, args,[],[], assets);
 
-            let txId = txn.txID().toString();
+            //First transaction beneficiary
+            //Backers
+
+            let txId = txn1.txID().toString();
     
             // Sign the transaction
             let sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
-            let signedTxn = txn.signTxn(sk);
+            let signedTxn1 = txn1.signTxn(sk);
             console.log("Signed transaction with txID: %s", txId);
     
             // Submit the transaction
-            await algodClient.sendRawTransaction(signedTxn).do();
+            await algodClient.sendRawTransaction([signedTxn1]).do();
     
             // Wait for confirmation
             await algosdk.waitForConfirmation(algodClient, txId, 2);
@@ -146,6 +220,7 @@ class FidelisContracts
             let reserve_address = process.env.TOKEN_RESERVE_ADDRESS;
             let pool_address = process.env.ADMIN_ADDRESS;
             let args = [];
+            let assets = [10458941, 95615734, 95615934];
             
             args.push(new Uint8Array(Buffer.from(op)));
             args.push(new Uint8Array(Buffer.from(loan_amount)));
@@ -174,7 +249,7 @@ class FidelisContracts
     
             let txn = algosdk.makeApplicationCreateTxn(sender, params, onComplete, 
                 approvalProgramBinary, clearProgramBinary, 
-                localInts, localBytes, globalInts, globalBytes, args, accounts);
+                localInts, localBytes, globalInts, globalBytes, args, accounts, [], assets);
             let txId = txn.txID().toString();
     
             // Sign the transaction
@@ -247,7 +322,7 @@ let params = {
 
 let fidelisContracts = new FidelisContracts();
 
-fidelisContracts.initiate(params).then((data)=>{
+fidelisContracts.registerAgent(params).then((data)=>{
     console.log(data);
 })
 

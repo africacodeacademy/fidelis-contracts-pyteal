@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const fidelisClient = require('../utils/deploy');
+const fidelisClient = require('../utils/fidelisClient');
 
 
 router.post('/initiate',(req, res)=>{
