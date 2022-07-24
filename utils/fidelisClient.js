@@ -86,10 +86,10 @@ class FidelisContracts
             // print the app-id
             let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
             let appId = transactionResponse['application-index'];
-            console.log("Registered agent for app-id: ",appId);
+            console.log("Registered agent for app-id: ",this.contract_id);
     
             response_obj['success'] = true;
-            response_obj['contract_id'] = appId;
+            response_obj['contract_id'] = this.contract_id;
             response_obj['description'] = 'Successfully registered agent';
     
             } 
