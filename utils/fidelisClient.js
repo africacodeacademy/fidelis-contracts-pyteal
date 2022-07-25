@@ -11,6 +11,8 @@ const baseServer = process.env.ALGODSERVER;
 const port = process.env.ALGODPORT;
 let algod_token = process.env.ALGOD_TOKEN
 let headers = { "x-api-key": algod_token };
+let reserve_address = process.env.TOKEN_RESERVE_ADDRESS;
+let pool_address = process.env.ADMIN_ADDRESS;
 
 const algodClient = new algosdk.Algodv2(algod_token, baseServer, port, headers); 
 
@@ -86,7 +88,7 @@ class FidelisContracts
             // print the app-id
             let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
             let appId = transactionResponse['application-index'];
-            console.log("Registered agent for app-id: ",this.contract_id);
+            console.log("Registered agent for app-id: ", this.contract_id);
     
             response_obj['success'] = true;
             response_obj['contract_id'] = this.contract_id;
@@ -129,25 +131,35 @@ class FidelisContracts
             'success': false
         };
 
-        let response = await this.deploy(txn_inputs);
-        this.contract_id = response.contract_id ?? null;
+        let response = await this.registerAgent(txn_inputs);
 
-        if(!this.contract_id)
+        if(!response.success)
         {
+            response_obj['message'] = "Agent needs to be successfully registered first";
             return response;
         }
 
         try
         {
             let op = "apply";
-            let assets = [10458941, 95615734, 95615934];
+            let assets = [process.env.USDCA_TOKEN_RESERVE_ASSETID, process.env.TRUST_TOKEN_RESERVE_ASSETID, process.env.BACKER_TOKEN_RESERVE_ASSETID];
             let args = [];
+            let accounts = [];
+            accounts.push(txn_inputs.receiver_address);
+            accounts.push(txn_inputs.agent_address);
+            //accounts.push(pool_address);
+            accounts.push(reserve_address);
             args.push(new Uint8Array(Buffer.from(op)));
             let params = await algodClient.getTransactionParams().do();
 
             console.log("Applying for loan. . . . ");
+
+            for (let i = 0; i < txn_inputs.backers.length; i++)
+            {
+                //accounts.push(txn_inputs.backers[i].address);
+            }
     
-            let txn1 = algosdk.makeApplicationNoOpTxn(sender, params, this.contract_id, args,[],[], assets);
+            let txn1 = algosdk.makeApplicationNoOpTxn(sender, params, this.contract_id, args, accounts,[], [20]);
 
             //First transaction beneficiary
             //Backers
@@ -217,8 +229,7 @@ class FidelisContracts
             let end_date = txn_inputs.end_date;
             let loan_amount = txn_inputs.loan_amount;
             let interest = txn_inputs.interest_rate;
-            let reserve_address = process.env.TOKEN_RESERVE_ADDRESS;
-            let pool_address = process.env.ADMIN_ADDRESS;
+
             let args = [];
             let assets = [10458941, 95615734, 95615934];
             
@@ -298,7 +309,7 @@ class FidelisContracts
 
 
 let params = {
-    "receiver_address": "hgs568i2yyrr6yfa8s7dfavysdtf86",
+    "receiver_address": "4LA4LGD2IY4KJPLPK4W4L5VJZCSIAHWVGVFHQ7MQHVY7PPVHFAU3UM3YYY",
     "receiver_staked_points": "25",
     "loan_amount": "50",
     "interest_rate": "1",
@@ -308,13 +319,13 @@ let params = {
     "backers": [
         {
         "points": 2.5,
-        "address": "mnabdivy90qonausfyfdt6a",
+        "address": "V6PZQZ3DPRALNRK6EPPNFRK2NF5DI3VNZBX4C5VEQDCYORSJTK2PYHWQVQ",
         "earned": 2.5
         },
 
         {
         "points": 2.5,
-        "address": "mnabdivy90qonausfyfdt6a",
+        "address": "6MYSPXEKKMAW4SMTCNXPF3QDTWQBY2Z4YTFXUUYWSLR2EOJHV66XNXLY5E",
         "earned": 2.5
         }
     ]
@@ -322,8 +333,9 @@ let params = {
 
 let fidelisContracts = new FidelisContracts();
 
-fidelisContracts.registerAgent(params).then((data)=>{
+fidelisContracts.initiate(params).then((data)=>{
     console.log(data);
 })
+
 
 
