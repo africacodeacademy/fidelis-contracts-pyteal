@@ -126,6 +126,12 @@ app_global_put
 byte "beneficiary"
 txna ApplicationArgs 7
 app_global_put
+byte "agent_address"
+txna ApplicationArgs 8
+app_global_put
+byte "stable_token"
+txna Assets 0
+app_global_put
 byte "loan_state"
 byte "openToInvestment"
 app_global_put
@@ -214,6 +220,23 @@ bz sub0_l2
 byte "loan_state"
 byte "alive"
 app_global_put
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "agent_address"
+app_global_get
+itxn_field AssetReceiver
+byte "loan_amount"
+app_global_get
+btoi
+itxn_field AssetAmount
+byte "stable_token"
+app_global_get
+itxn_field XferAsset
+byte "pool_address"
+app_global_get
+itxn_field AssetSender
+itxn_submit
 sub0_l2:
 retsub
 sub1: // reclaim

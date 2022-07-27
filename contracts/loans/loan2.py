@@ -15,6 +15,8 @@ def approval():
     reserve_address = Bytes("reserve_address")
     pool_address = Bytes("pool_address")
     loan_state = Bytes('loan_state')
+    agent_address = Bytes('agent_address')
+    stable_token = Bytes('stable_token')
 
 
     # expressions
@@ -58,6 +60,8 @@ def approval():
         App.globalPut(reserve_address, Txn.application_args[5]),
         App.globalPut(pool_address, Txn.application_args[6]),
         App.globalPut(beneficiary_address, Txn.application_args[7]),
+        App.globalPut(agent_address, Txn.application_args[8]),
+        App.globalPut(stable_token, Txn.assets[0]),
         App.globalPut(loan_state, Bytes('openToInvestment')),
         Approve()
     )
@@ -97,14 +101,25 @@ def approval():
                 If(App.globalGet(staked_amount) >= App.globalGet(loan_amount))
                 .Then(
                     Seq(
-                        App.globalPut(loan_state, Bytes('alive'))
+                        App.globalPut(loan_state, Bytes('alive')),
+                        InnerTxnBuilder.Begin(),
+                        InnerTxnBuilder.SetFields(
+                            {
+                                TxnField.type_enum: TxnType.AssetTransfer,
+                                TxnField.asset_receiver: App.globalGet(agent_address),
+                                TxnField.asset_amount: Btoi(App.globalGet(loan_amount)),
+                                TxnField.xfer_asset: App.globalGet(stable_token),
+                                TxnField.asset_sender: App.globalGet(pool_address),
+                            }
+                        ),
+                        InnerTxnBuilder.Submit(),
                     )
                 )
             )
 
     @Subroutine(TealType.none)
     def reclaim():
-        # allow backers  ad benefitiary to relcaim  staked points,
+        # allow backers  to relcaim  staked points,
         # update account local state with investment amount
         # preconditions: 
         #       must have backed this loan, check  local state for public key
