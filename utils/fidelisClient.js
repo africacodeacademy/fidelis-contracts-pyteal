@@ -231,7 +231,7 @@ class FidelisContracts
             let interest = txn_inputs.interest_rate;
 
             let args = [];
-            let assets = [10458941, 95615734, 95615934];
+            let assets = [process.env.USDCA_TOKEN_RESERVE_ASSETID];
             
             args.push(new Uint8Array(Buffer.from(op)));
             args.push(new Uint8Array(Buffer.from(loan_amount)));
@@ -240,6 +240,8 @@ class FidelisContracts
             args.push(new Uint8Array(Buffer.from(end_date)));
             args.push(new Uint8Array(Buffer.from(reserve_address)));
             args.push(new Uint8Array(Buffer.from(pool_address)));
+            args.push(new Uint8Array(Buffer.from(txn_inputs.receiver_address)));
+            args.push(new Uint8Array(Buffer.from(txn_inputs.agent_address)));
             
             let accounts = [reserve_address, pool_address];
     
