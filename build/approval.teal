@@ -14,11 +14,11 @@ bnz main_l21
 txn OnCompletion
 int OptIn
 ==
-bnz main_l18
+bnz main_l20
 txn OnCompletion
 int CloseOut
 ==
-bnz main_l17
+bnz main_l19
 txn OnCompletion
 int NoOp
 ==
@@ -26,49 +26,48 @@ bnz main_l7
 err
 main_l7:
 txna ApplicationArgs 0
-byte "apply"
+byte "payment"
+==
+bnz main_l18
+txna ApplicationArgs 0
+byte "reclaim"
+==
+bnz main_l17
+txna ApplicationArgs 0
+byte "invest"
 ==
 bnz main_l16
 txna ApplicationArgs 0
-byte "payment"
+byte "force_close"
 ==
 bnz main_l15
 txna ApplicationArgs 0
-byte "force_close"
-==
-bnz main_l14
-txna ApplicationArgs 0
 byte "check_default"
 ==
-bnz main_l12
+bnz main_l13
 err
-main_l12:
-int 1
-return
 main_l13:
-int 0
+int 1
 return
 main_l14:
-int 1
-return
-main_l15:
-callsub sub2
-b main_l13
-main_l16:
-callsub sub3
-b main_l13
-main_l17:
 int 0
 return
-main_l18:
-txna ApplicationArgs 0
-byte "register_agent"
-==
-bnz main_l20
-err
-main_l20:
+main_l15:
 int 1
 return
+main_l16:
+callsub sub0
+b main_l14
+main_l17:
+callsub sub1
+b main_l14
+main_l18:
+callsub sub2
+b main_l14
+main_l19:
+int 0
+return
+main_l20:
 int 1
 return
 main_l21:
@@ -78,6 +77,34 @@ main_l22:
 int 0
 return
 main_l23:
+txna ApplicationArgs 1
+btoi
+int 0
+>
+assert
+txna ApplicationArgs 2
+btoi
+int 0
+>
+assert
+txna ApplicationArgs 4
+btoi
+txna ApplicationArgs 3
+btoi
+>
+assert
+byte "balance"
+txna ApplicationArgs 1
+btoi
+txna ApplicationArgs 1
+btoi
+txna ApplicationArgs 2
+btoi
+int 100
+/
+*
++
+app_global_put
 byte "loan_amount"
 txna ApplicationArgs 1
 app_global_put
@@ -96,99 +123,167 @@ app_global_put
 byte "pool_address"
 txna ApplicationArgs 6
 app_global_put
+byte "beneficiary"
+txna ApplicationArgs 7
+app_global_put
+byte "loan_state"
+byte "openToInvestment"
+app_global_put
 int 1
 return
-sub0: // check_txn_conditions
-store 3
-load 3
-gtxns TypeEnum
-int axfer
+sub0: // invest
+byte "loan_state"
+app_global_get
+byte "openToInvestment"
 ==
-load 3
-gtxns AssetReceiver
-global CurrentApplicationAddress
-==
-&&
-load 3
-gtxns AssetCloseTo
-global ZeroAddress
-==
-&&
-retsub
-sub1: // pre_assertions
-global GroupSize
-int 2
->
-gtxn 1 AssetAmount
-int 1
->
-&&
 assert
-global GroupSize
-store 0
-byte "beneficiary_stake"
-gtxn 0 AssetAmount
-app_global_put
-byte "beneficiary"
-gtxn 0 AssetSender
-app_global_put
-load 0
-store 2
-int 0
-callsub sub0
-int 0
-==
-bnz sub1_l2
-int 0
-retsub
-sub1_l2:
-int 4
-store 1
-sub1_l3:
-load 1
-load 2
+txna ApplicationArgs 1
+btoi
+byte "staked_amount"
+app_global_get
++
+byte "loan_amount"
+app_global_get
 <=
-bnz sub1_l7
-byte "staked_tokens"
+assert
+txna ApplicationArgs 1
+btoi
+int 0
+>
+assert
+txn Sender
+txna Assets 0
+asset_holding_get AssetBalance
+store 0
+store 1
+load 0
+assert
+load 1
+txna ApplicationArgs 1
+btoi
+>=
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+txna ApplicationArgs 1
+btoi
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+txn Sender
+itxn_field AssetSender
+itxn_submit
+txn Sender
+txn ApplicationID
+itob
+byte "_key"
+concat
+txna ApplicationArgs 2
+app_local_put
+txn Sender
+txn ApplicationID
+itob
+byte "_amount"
+concat
+txna ApplicationArgs 1
+btoi
+app_local_put
+txn Sender
+txn ApplicationID
+itob
+byte "_asset"
+concat
+txna Assets 0
+app_local_put
+byte "staked_amount"
+byte "staked_amount"
+app_global_get
+txna ApplicationArgs 1
+btoi
++
+app_global_put
+byte "staked_amount"
 app_global_get
 byte "loan_amount"
 app_global_get
-!=
-bnz sub1_l6
-int 1
-retsub
-sub1_l6:
-int 0
-retsub
-sub1_l7:
-load 1
-callsub sub0
-int 0
-==
-bnz sub1_l10
-int 0
-return
-sub1_l9:
-load 1
-int 1
-+
-store 1
-b sub1_l3
-sub1_l10:
-byte "staked_tokens"
-byte "staked_tokens"
-app_global_get
-load 1
-gtxns AssetAmount
-+
+>=
+bz sub0_l2
+byte "loan_state"
+byte "alive"
 app_global_put
-b sub1_l9
-sub2: // payment
+sub0_l2:
+retsub
+sub1: // reclaim
+byte "loan_state"
+app_global_get
+byte "matured"
+==
+assert
+txn Sender
+txn ApplicationID
+itob
+byte "_key"
+concat
+app_local_get
+int 0
+!=
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+txn Sender
+itxn_field AssetReceiver
+txn Sender
+txn ApplicationID
+itob
+byte "_amount"
+concat
+app_local_get
+itxn_field AssetAmount
+txn Sender
+txn ApplicationID
+itob
+byte "_asset"
+concat
+app_local_get
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field AssetSender
+itxn_submit
+txn Sender
+txn ApplicationID
+itob
+byte "_amount"
+concat
+int 0
+app_local_put
+retsub
+sub2: // repay
 txna ApplicationArgs 1
 btoi
+int 0
+>
+assert
 byte "balance"
 app_global_get
-<=
+txna ApplicationArgs 1
+btoi
+>=
+assert
+txn Sender
+txna Assets 0
+asset_holding_get AssetBalance
+store 2
+store 3
+load 2
+assert
+load 3
+txna ApplicationArgs 1
+btoi
+>=
 assert
 itxn_begin
 int axfer
@@ -211,40 +306,13 @@ txna ApplicationArgs 1
 btoi
 -
 app_global_put
-retsub
-sub3: // initialize_loan
-callsub sub1
-int 1
-==
-bz sub3_l2
-int 0
-return
-sub3_l2:
 byte "balance"
-byte "loan_amount"
 app_global_get
-byte "loan_amount"
-app_global_get
-byte "interest_rate"
-app_global_get
-int 100
-/
-*
-+
+int 0
+==
+bz sub2_l2
+byte "loan_state"
+byte "matured"
 app_global_put
-itxn_begin
-int axfer
-itxn_field TypeEnum
-byte "agent_address"
-app_global_get
-itxn_field AssetReceiver
-byte "loan_amount"
-app_global_get
-itxn_field AssetAmount
-txna Assets 0
-itxn_field XferAsset
-byte "pool_address"
-app_global_get
-itxn_field AssetSender
-itxn_submit
+sub2_l2:
 retsub
