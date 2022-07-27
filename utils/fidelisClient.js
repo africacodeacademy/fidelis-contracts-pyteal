@@ -212,6 +212,20 @@ class FidelisContracts
         
     }
 
+    async invest (txn_inputs)
+    {
+        let response_obj = {
+            'success': false
+        };
+
+
+        if(!this.contract_id)
+        {
+            response_obj['message'] = "No contract selected";
+            return response_obj;
+        }
+    }
+
 
     async deploy (txn_inputs) {
  
@@ -230,8 +244,10 @@ class FidelisContracts
             let loan_amount = txn_inputs.loan_amount;
             let interest = txn_inputs.interest_rate;
 
+            console.log('token', process.env.USDCA_TOKEN_RESERVE_ASSETID);
+
             let args = [];
-            let assets = [process.env.USDCA_TOKEN_RESERVE_ASSETID];
+            let assets = [200];
             
             args.push(new Uint8Array(Buffer.from(op)));
             args.push(new Uint8Array(Buffer.from(loan_amount)));
@@ -335,7 +351,7 @@ let params = {
 
 let fidelisContracts = new FidelisContracts();
 
-fidelisContracts.initiate(params).then((data)=>{
+fidelisContracts.deploy(params).then((data)=>{
     console.log(data);
 })
 
