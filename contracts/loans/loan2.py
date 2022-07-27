@@ -104,7 +104,7 @@ def approval():
 
     @Subroutine(TealType.none)
     def reclaim():
-        # allow backers  to relcaim  staked points,
+        # allow backers  ad benefitiary to relcaim  staked points,
         # update account local state with investment amount
         # preconditions: 
         #       must have backed this loan, check  local state for public key
