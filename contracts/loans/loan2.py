@@ -77,11 +77,11 @@ def approval():
         inverstorAssetBalance = AssetHolding.balance(Txn.sender(), Txn.assets[0])
         return Seq(
                 Assert(App.globalGet(loan_state) == Bytes('openToInvestment')),
-                Assert(Btoi(Txn.application_args[1]) + App.globalGet(staked_amount) <= App.globalGet(loan_amount)),
+                Assert(Btoi(Txn.application_args[1]) + App.globalGet(staked_amount) <= Btoi(App.globalGet(loan_amount))),
                 Assert(Btoi(Txn.application_args[1]) > Int(0)), #check investment amount > 0
                 inverstorAssetBalance,
-                Assert(inverstorAssetBalance.hasValue()),
-                Assert(inverstorAssetBalance.value() >= Btoi(Txn.application_args[1])),
+                #Assert(inverstorAssetBalance.hasValue()),
+                #Assert(inverstorAssetBalance.value() >= Btoi(Txn.application_args[1])),
                 
                 InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields(

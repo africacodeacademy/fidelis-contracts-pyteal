@@ -150,6 +150,7 @@ app_global_get
 +
 byte "loan_amount"
 app_global_get
+btoi
 <=
 assert
 txna ApplicationArgs 1
@@ -162,13 +163,6 @@ txna Assets 0
 asset_holding_get AssetBalance
 store 0
 store 1
-load 0
-assert
-load 1
-txna ApplicationArgs 1
-btoi
->=
-assert
 itxn_begin
 int axfer
 itxn_field TypeEnum
