@@ -265,7 +265,7 @@ class FidelisContracts
         try {
             const localInts = 0
             const localBytes = 0
-            const globalInts = 0
+            const globalInts = 2
             const globalBytes = 12
     
             let op = "apply";
@@ -277,7 +277,7 @@ class FidelisContracts
             console.log('token', process.env.USDCA_TOKEN_RESERVE_ASSETID);
 
             let args = [];
-            let assets = [200];
+            let assets = [parseInt(process.env.USDCA_TOKEN_RESERVE_ASSETID)];
             
             args.push(new Uint8Array(Buffer.from(op)));
             args.push(new Uint8Array(Buffer.from(loan_amount)));
@@ -362,8 +362,8 @@ let params = {
     "loan_amount": "50",
     "interest_rate": "1",
     "agent_address": "IQDPRKBXGWTC3UQ25JJOBQVGKQSV3B55XR4YSZV6TPYE5V3XI3S7ZRECHM",
-    "start_date": "123434532",
-    "end_date": "1658994059",
+    "start_date": "1234345",
+    "end_date": "16589944",
     "backers": [
         {
         "points": 2.5,
