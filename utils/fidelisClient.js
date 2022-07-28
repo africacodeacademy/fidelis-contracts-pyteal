@@ -1,12 +1,9 @@
 const algosdk = require("algosdk");
 const fs = require("fs/promises");
 const dotenv = require("dotenv");
-<<<<<<< HEAD
 const INVESTOR_TYPE = require('../constants/investorTypes');
 
-=======
 const walletUtils = require("./wallet");
->>>>>>> fac851414a0192c3d4e4a325bfac6a6a35cffad0
 
 dotenv.config({
   path: ".env",
