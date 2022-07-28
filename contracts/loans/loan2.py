@@ -90,7 +90,7 @@ def approval():
                         TxnField.asset_receiver: Global.current_application_address(),
                         TxnField.asset_amount: Btoi(Txn.application_args[1]),
                         TxnField.xfer_asset: Txn.assets[0],
-                        TxnField.asset_sender: Txn.sender() 
+                        TxnField.sender: Txn.sender() 
                     }
                 ),
                 InnerTxnBuilder.Submit(),
@@ -109,7 +109,7 @@ def approval():
                                 TxnField.asset_receiver: App.globalGet(agent_address),
                                 TxnField.asset_amount: Btoi(App.globalGet(loan_amount)),
                                 TxnField.xfer_asset: App.globalGet(stable_token),
-                                TxnField.asset_sender: App.globalGet(pool_address),
+                                TxnField.sender: App.globalGet(pool_address),
                             }
                         ),
                         InnerTxnBuilder.Submit(),
@@ -137,7 +137,7 @@ def approval():
                         TxnField.asset_receiver: Txn.sender(),
                         TxnField.asset_amount: App.localGet(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount'))), #amount
                         TxnField.xfer_asset: App.localGet(Txn.sender(), Concat(Itob(Txn.application_id()),Bytes('_asset'))),
-                        TxnField.asset_sender: Global.current_application_address()
+                        TxnField.sender: Global.current_application_address()
                     }
                 ),
                 InnerTxnBuilder.Submit(),
@@ -165,7 +165,7 @@ def approval():
                         TxnField.asset_receiver: App.globalGet(pool_address),
                         TxnField.asset_amount: Btoi(Txn.application_args[1]), #amount
                         TxnField.xfer_asset: Txn.assets[0],
-                        TxnField.asset_sender: Txn.sender() #agent address
+                        TxnField.sender: Txn.sender() #agent address
                     }
                 ),
                 InnerTxnBuilder.Submit(),   

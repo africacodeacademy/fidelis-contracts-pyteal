@@ -174,7 +174,7 @@ itxn_field AssetAmount
 txna Assets 0
 itxn_field XferAsset
 txn Sender
-itxn_field AssetSender
+itxn_field Sender
 itxn_submit
 txn Sender
 txn ApplicationID
@@ -229,7 +229,7 @@ app_global_get
 itxn_field XferAsset
 byte "pool_address"
 app_global_get
-itxn_field AssetSender
+itxn_field Sender
 itxn_submit
 sub0_l2:
 retsub
@@ -268,7 +268,7 @@ concat
 app_local_get
 itxn_field XferAsset
 global CurrentApplicationAddress
-itxn_field AssetSender
+itxn_field Sender
 itxn_submit
 txn Sender
 txn ApplicationID
@@ -314,7 +314,7 @@ itxn_field AssetAmount
 txna Assets 0
 itxn_field XferAsset
 txn Sender
-itxn_field AssetSender
+itxn_field Sender
 itxn_submit
 byte "balance"
 byte "balance"
