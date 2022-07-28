@@ -1,7 +1,7 @@
 const algosdk = require("algosdk");
 const fs = require('fs/promises');
 const dotenv = require("dotenv");
-const investor_type = require('../constants/investorTypes');
+const INVESTOR_TYPE = require('../constants/investorTypes');
 
 
 dotenv.config({
@@ -216,11 +216,57 @@ class FidelisContracts
     /**
      * 
      * @param {*} txn_inputs 
+     * @returns 
+     */
+    async initiationFlow(txn_inputs)
+    {
+       /* let deploy_response = await this.deploy(txn_inputs);
+        let response_obj = {
+            'success': false
+        };
+
+        if(!deploy_response.success)
+        {
+            return deploy_response;
+        }
+        this.contract_id = deploy_response.contract_id;
+
+        */
+        
+        
+        this.contract_id = 101488900;
+        /*let opt_in_acc = {
+            address: 'THFBKZU22YYS33BRR4YFM6JLRTMNIZKARZQVYUMWHWTUFR5WB6HJGTBCDA',
+            mnemonic: "become relax stool love pupil detect grocery oppose mansion bracket witness horror theme reopen sign glide recall loan heavy arch asset stock leg above recall"
+        }*/
+
+        let opt_in_acc = {
+            address: txn_inputs.receiver_address,
+            mnemonic: txn_inputs.receiver_mnemonic
+        }
+        console.log(opt_in_acc.mnemonic)
+        let opt_in_res = await this.optIn(opt_in_acc);
+        console.log(opt_in_res);
+
+        
+
+        
+        //Add Beneficiary
+        let beneficiary_response = await this.invest(txn_inputs, INVESTOR_TYPE.BENEFICIARY);
+        return beneficiary_response;
+    }
+
+    /**
+     * 
+     * @param {*} txn_inputs 
      * @param {*} investor_type 
      * @returns 
      */
     async invest (txn_inputs, investor_type)
     {
+        let sender_addr = "";
+        let sender_mnemonic = "";
+        let sender_acc = null;
         let response_obj = {
             'success': false
         };
@@ -233,12 +279,29 @@ class FidelisContracts
         }
 
         try {
-            switch (investor_type) {
-                case investor_type.BENEFICIARY:
+            let op = "invest";
+            let encryption_key = "tobemade";
+            let assets = [];
+            let args = [];
+
+            args.push(new Uint8Array(Buffer.from(op)));
+
+            switch (investor_type) 
+            {
+                case INVESTOR_TYPE.BENEFICIARY:
+                    assets.push(parseInt(process.env.TRUST_TOKEN_RESERVE_ASSETID));
+                    args.push(new Uint8Array(Buffer.from(txn_inputs.receiver_staked_points)));
+                    sender_addr = txn_inputs.receiver_address;
+                    sender_mnemonic = txn_inputs.receiver_mnemonic;
+                    sender_acc = algosdk.mnemonicToSecretKey(sender_mnemonic);
                     
                     break;
 
-                case investor_type.BACKER:
+                case INVESTOR_TYPE.BACKER:
+                    assets.push(parseInt(process.env.BACKER_TOKEN_RESERVE_ASSETID));
+                    args.push(new Uint8Array(Buffer.from(txn_inputs.points)));
+                    sender_mnemonic = txn_inputs.mnemonic;
+                    sender_acc = algosdk.mnemonicToSecretKey(sender_mnemonic);
 
                     break;
 
@@ -246,15 +309,136 @@ class FidelisContracts
                 default:
                     response_obj['message'] = "Wrong investor type provided"
                     return response_obj;
-                    break;
             }
+            args.push(new Uint8Array(Buffer.from(encryption_key)));
 
+            let params = await algodClient.getTransactionParams().do();
+    
+            console.log(`Adding Recipient ...`);
+    
+            let  txn = algosdk.makeApplicationNoOpTxn(sender_addr, params, this.contract_id, args, [], [], assets);
+
+            let txId = txn.txID().toString();
+    
+            // Sign the transaction
             
-        } catch (err) {
+            let signedTxn = txn.signTxn(sender_acc.sk);
+            console.log("Signed transaction with txID: %s", txId);
+    
+            // Submit the transaction
+            await algodClient.sendRawTransaction(signedTxn).do();
+    
+            // Wait for confirmation
+            await algosdk.waitForConfirmation(algodClient, txId, 2);
+    
+            // print the app-id
+            let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
+            let appId = transactionResponse['application-index'];
+            console.log(`Added ${investor_type} for app-id: `, this.contract_id);
+    
+            response_obj['success'] = true;
+            response_obj['contract_id'] = this.contract_id;
+            response_obj['description'] = `Successfully added ${investor_type}`;
+    
+            } 
             
+            catch (err) {
+                // If network request, display verbose error
+                if (err.response) {
+    
+                    response_obj['message'] = err.response.text;
+                    response_obj['status'] = err.response.status
+                    response_obj['description']= 'Network request unsuccessful';
+                    
+                }
+    
+                else
+                {
+                    //TODO: Handle errors unrelated to network
+                    response_obj['description']= `Could not add ${investor_type}`;
+                    console.log(err);
+    
+                }
         }
+        
+        return response_obj;
 
     }
+
+    async optIn(txn_inputs)
+    {
+        let response_obj = {
+            'success': false
+        };
+        let sender_addr = txn_inputs.address;
+        let sender_mnemonic = txn_inputs.mnemonic;
+        let sk = '';
+        
+        if(sender_mnemonic !== "")
+        {
+           sk = algosdk.mnemonicToSecretKey(sender_mnemonic).sk;
+        }
+        else
+        {
+            sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
+        }
+
+
+        try
+        {
+            let params = await algodClient.getTransactionParams().do();
+    
+            console.log(`Opting in ...`);
+    
+            let  txn = algosdk.makeApplicationOptInTxn(sender_addr, params, this.contract_id);
+    
+            let txId = txn.txID().toString();
+    
+            // Sign the transaction
+            
+            let signedTxn = txn.signTxn(sk);
+            console.log("Signed transaction with txID: %s", txId);
+    
+            // Submit the transaction
+            await algodClient.sendRawTransaction(signedTxn).do();
+    
+            // Wait for confirmation
+            await algosdk.waitForConfirmation(algodClient, txId, 2);
+    
+            // print the app-id
+            let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
+            let appId = transactionResponse['application-index'];
+            console.log(`opted in`);
+    
+            response_obj['success'] = true;
+            response_obj['contract_id'] = this.contract_id;
+            response_obj['description'] = `Successfully opted in`;
+    
+        }
+
+        catch (err) {
+            // If network request, display verbose error
+            if (err.response) {
+
+                response_obj['message'] = err.response.text;
+                response_obj['status'] = err.response.status
+                response_obj['description']= 'Network request unsuccessful';
+                
+            }
+
+            else
+            {
+                //TODO: Handle errors unrelated to network
+                response_obj['description']= `Could not opt in`;
+                console.log(err);
+
+            }
+    }
+
+    return response_obj;
+    }
+
+
 
 
     async deploy (txn_inputs) {
@@ -358,6 +542,7 @@ class FidelisContracts
 
 let params = {
     "receiver_address": "4LA4LGD2IY4KJPLPK4W4L5VJZCSIAHWVGVFHQ7MQHVY7PPVHFAU3UM3YYY",
+    "receiver_mnemonic": "list merit round cruel observe essence embark vendor hybrid satisfy oblige menu lava exile crane pact wing film salute half whisper recipe era abstract region",
     "receiver_staked_points": "25",
     "loan_amount": "50",
     "interest_rate": "1",
@@ -368,12 +553,14 @@ let params = {
         {
         "points": 2.5,
         "address": "V6PZQZ3DPRALNRK6EPPNFRK2NF5DI3VNZBX4C5VEQDCYORSJTK2PYHWQVQ",
+        "mnemonic": "lift insane audit subject liar celery wreck mixed crater peace chief forum injury student beyond seven virtual remove outside strong asset shallow supply absent shock",
         "earned": 2.5
         },
 
         {
         "points": 2.5,
         "address": "6MYSPXEKKMAW4SMTCNXPF3QDTWQBY2Z4YTFXUUYWSLR2EOJHV66XNXLY5E",
+        "mnemonic": "arrest hedgehog toilet expose beef powder vast just cost pink coffee round evolve decade shell glare hunt cousin stay pioneer execute close drive able denial",
         "earned": 2.5
         }
     ]
@@ -381,7 +568,8 @@ let params = {
 
 let fidelisContracts = new FidelisContracts();
 
-fidelisContracts.deploy(params).then((data)=>{
+
+fidelisContracts.initiationFlow(params).then((data)=>{
     console.log(data);
 })
 
