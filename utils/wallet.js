@@ -207,3 +207,9 @@ exports.freezeWalletAssets = async () => {
     return Promise.reject(err);
   }
 };
+
+exports.getSk = async (address) => {
+  let wallet = await Wallet.findOne({ address: address }).exec();
+  if (wallet) return wallet.sk;
+  else return "";
+};
