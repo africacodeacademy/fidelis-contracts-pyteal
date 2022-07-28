@@ -1,6 +1,7 @@
 const algosdk = require("algosdk");
 const fs = require('fs/promises');
 const dotenv = require("dotenv");
+const investor_type = require('../constants/investorTypes');
 
 
 dotenv.config({
@@ -212,7 +213,13 @@ class FidelisContracts
         
     }
 
-    async invest (txn_inputs)
+    /**
+     * 
+     * @param {*} txn_inputs 
+     * @param {*} investor_type 
+     * @returns 
+     */
+    async invest (txn_inputs, investor_type)
     {
         let response_obj = {
             'success': false
@@ -224,6 +231,29 @@ class FidelisContracts
             response_obj['message'] = "No contract selected";
             return response_obj;
         }
+
+        try {
+            switch (investor_type) {
+                case investor_type.BENEFICIARY:
+                    
+                    break;
+
+                case investor_type.BACKER:
+
+                    break;
+
+            
+                default:
+                    response_obj['message'] = "Wrong investor type provided"
+                    return response_obj;
+                    break;
+            }
+
+            
+        } catch (err) {
+            
+        }
+
     }
 
 
@@ -333,7 +363,7 @@ let params = {
     "interest_rate": "1",
     "agent_address": "IQDPRKBXGWTC3UQ25JJOBQVGKQSV3B55XR4YSZV6TPYE5V3XI3S7ZRECHM",
     "start_date": "123434532",
-    "end_date": "32342342",
+    "end_date": "1658994059",
     "backers": [
         {
         "points": 2.5,

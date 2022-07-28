@@ -1,6 +1,6 @@
 const INVESTOR_TYPE = {
-    beneficiary: 0,
-    backer: 1,
+    BENEFICIARY: 0,
+    BACKER: 1,
  };
  Object.freeze(INVESTOR_TYPE);
 
