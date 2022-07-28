@@ -632,6 +632,6 @@ let params = {
 let fidelisContracts = new FidelisContracts();
 
 
-fidelisContracts.initiationFlow(params).then((data)=>{
+fidelisContracts.deploy(params).then((data)=>{
     console.log(data);
 })
