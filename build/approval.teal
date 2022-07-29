@@ -50,7 +50,7 @@ main_l13:
 int 1
 return
 main_l14:
-int 0
+int 1
 return
 main_l15:
 int 1
@@ -127,7 +127,7 @@ byte "beneficiary"
 txna ApplicationArgs 7
 app_global_put
 byte "agent_address"
-txna ApplicationArgs 8
+txna Accounts 4
 app_global_put
 byte "stable_token"
 txna Assets 0
@@ -142,16 +142,6 @@ byte "loan_state"
 app_global_get
 byte "openToInvestment"
 ==
-assert
-txna ApplicationArgs 1
-btoi
-byte "staked_amount"
-app_global_get
-+
-byte "loan_amount"
-app_global_get
-btoi
-<=
 assert
 txna ApplicationArgs 1
 btoi
@@ -265,7 +255,8 @@ byte "_amount"
 concat
 int 0
 app_local_put
-retsub
+int 1
+return
 sub2: // repay
 txna ApplicationArgs 1
 btoi

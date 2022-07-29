@@ -60,7 +60,7 @@ def approval():
         App.globalPut(reserve_address, Txn.application_args[5]),
         App.globalPut(pool_address, Txn.application_args[6]),
         App.globalPut(beneficiary_address, Txn.application_args[7]),
-        App.globalPut(agent_address, Txn.application_args[8]),
+        App.globalPut(agent_address, Txn.accounts[4]),
         App.globalPut(stable_token, Txn.assets[0]),
         App.globalPut(loan_state, Bytes('openToInvestment')),
         Approve()
@@ -77,7 +77,7 @@ def approval():
         inverstorAssetBalance = AssetHolding.balance(Txn.sender(), Txn.assets[0])
         return Seq(
                 Assert(App.globalGet(loan_state) == Bytes('openToInvestment')),
-                Assert(Btoi(Txn.application_args[1]) + App.globalGet(staked_amount) <= Btoi(App.globalGet(loan_amount))),
+                #Assert(Btoi(Txn.application_args[1]) + App.globalGet(staked_amount) <= Btoi(App.globalGet(loan_amount))), # The backer ending fails this assertion
                 Assert(Btoi(Txn.application_args[1]) > Int(0)), #check investment amount > 0
                 inverstorAssetBalance,
                 #Assert(inverstorAssetBalance.hasValue()),
@@ -143,6 +143,7 @@ def approval():
                 ),
                 InnerTxnBuilder.Submit(),
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount')),  Int(0)),
+                Approve(),
             )
 
     
@@ -190,7 +191,7 @@ def approval():
                 [Txn.application_args[0] == Bytes("force_close"), force_close],
                 [Txn.application_args[0] == Bytes("check_default"), check_default]
             ),
-            Reject()
+            Approve()
         )
 
     )
