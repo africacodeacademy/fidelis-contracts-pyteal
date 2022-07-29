@@ -53,16 +53,17 @@ def approval():
         Assert(Btoi(Txn.application_args[2]) > Int(0)), #check valid interest rate
         Assert(Btoi(Txn.application_args[4]) > Btoi(Txn.application_args[3])), #check valid dates
         App.globalPut(balance,  Btoi(Txn.application_args[1])+ (Btoi(Txn.application_args[1])* (Btoi(Txn.application_args[2])/Int(100)))),
-        App.globalPut(loan_amount, Txn.application_args[1]),
-        App.globalPut(interest_rate, Txn.application_args[2]),
-        App.globalPut(start_date, Txn.application_args[3]),
-        App.globalPut(end_date, Txn.application_args[4]),
+        App.globalPut(loan_amount, Btoi(Txn.application_args[1])),
+        App.globalPut(interest_rate, Btoi(Txn.application_args[2])),
+        App.globalPut(start_date, Btoi(Txn.application_args[3])),
+        App.globalPut(end_date, Btoi(Txn.application_args[4])),
         App.globalPut(reserve_address, Txn.application_args[5]),
         App.globalPut(pool_address, Txn.application_args[6]),
         App.globalPut(beneficiary_address, Txn.application_args[7]),
         App.globalPut(agent_address, Txn.accounts[4]),
         App.globalPut(stable_token, Txn.assets[0]),
         App.globalPut(loan_state, Bytes('openToInvestment')),
+        App.globalPut(staked_amount, Int(0),
         Approve()
     )
 
