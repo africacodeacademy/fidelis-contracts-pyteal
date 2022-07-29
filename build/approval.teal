@@ -163,19 +163,6 @@ txna Assets 0
 asset_holding_get AssetBalance
 store 0
 store 1
-itxn_begin
-int axfer
-itxn_field TypeEnum
-global CurrentApplicationAddress
-itxn_field AssetReceiver
-txna ApplicationArgs 1
-btoi
-itxn_field AssetAmount
-txna Assets 0
-itxn_field XferAsset
-txn Sender
-itxn_field Sender
-itxn_submit
 txn Sender
 txn ApplicationID
 itob
@@ -209,6 +196,7 @@ byte "staked_amount"
 app_global_get
 byte "loan_amount"
 app_global_get
+btoi
 >=
 bz sub0_l2
 byte "loan_state"

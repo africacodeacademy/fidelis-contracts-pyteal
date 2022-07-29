@@ -83,22 +83,23 @@ def approval():
                 #Assert(inverstorAssetBalance.hasValue()),
                 #Assert(inverstorAssetBalance.value() >= Btoi(Txn.application_args[1])),
                 
-                InnerTxnBuilder.Begin(),
-                InnerTxnBuilder.SetFields(
-                    {
-                        TxnField.type_enum: TxnType.AssetTransfer,
-                        TxnField.asset_receiver: Global.current_application_address(),
-                        TxnField.asset_amount: Btoi(Txn.application_args[1]),
-                        TxnField.xfer_asset: Txn.assets[0],
-                        TxnField.sender: Txn.sender() 
-                    }
-                ),
-                InnerTxnBuilder.Submit(),
+                ### 
+                #InnerTxnBuilder.Begin(),
+                #InnerTxnBuilder.SetFields(
+                #    {
+                #        TxnField.type_enum: TxnType.AssetTransfer,
+                #        TxnField.asset_receiver: Global.current_application_address(),
+                #        TxnField.asset_amount: Btoi(Txn.application_args[1]),
+                #        TxnField.xfer_asset: Txn.assets[0],
+                #        TxnField.sender: Txn.sender() 
+                #    }
+                #),
+                #InnerTxnBuilder.Submit(),
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes("_key")),  Txn.application_args[2]),
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount')),  Btoi(Txn.application_args[1])),
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_asset')),  Txn.assets[0]),
                 App.globalPut(staked_amount, App.globalGet(staked_amount) + Btoi(Txn.application_args[1])),
-                If(App.globalGet(staked_amount) >= App.globalGet(loan_amount))
+                If(App.globalGet(staked_amount) >= Btoi(App.globalGet(loan_amount)))
                 .Then(
                     Seq(
                         App.globalPut(loan_state, Bytes('alive')),
