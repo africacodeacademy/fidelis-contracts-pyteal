@@ -282,40 +282,59 @@ class FidelisContracts {
      */
     async initiationFlow(txn_inputs)
     {
-       /* let deploy_response = await this.deploy(txn_inputs);
         let response_obj = {
             'success': false
         };
-
-        if(!deploy_response.success)
+        let backer_response = null;
+        let deploy_response = await this.deploy(txn_inputs);
+        console.log(deploy_response);
+        if(deploy_response.success)
         {
-            return deploy_response;
+          this.contract_id = deploy_response.contract_id;
         }
-        this.contract_id = deploy_response.contract_id;
 
-        */
-        
-        
-        this.contract_id = 101488900;
-        /*let opt_in_acc = {
-            address: 'THFBKZU22YYS33BRR4YFM6JLRTMNIZKARZQVYUMWHWTUFR5WB6HJGTBCDA',
-            mnemonic: "become relax stool love pupil detect grocery oppose mansion bracket witness horror theme reopen sign glide recall loan heavy arch asset stock leg above recall"
-        }*/
+        else
+        {
+          return deploy_response;
+        }
 
+
+        // Beneficiary opt in
         let opt_in_acc = {
             address: txn_inputs.receiver_address,
             mnemonic: txn_inputs.receiver_mnemonic
         }
-        console.log(opt_in_acc.mnemonic)
+
         let opt_in_res = await this.optIn(opt_in_acc);
         console.log(opt_in_res);
 
-        
+        //agent opt in
+        /*opt_in_acc['address'] = txn_inputs.agent_address;
+        opt_in_acc['mnemonic'] = txn_inputs.agent_mnemonic;
+        opt_in_res = await this.optIn(opt_in_acc);
+        console.log(opt_in_res);*/
 
-        
-        //Add Beneficiary
         let beneficiary_response = await this.invest(txn_inputs, INVESTOR_TYPE.BENEFICIARY);
-        return beneficiary_response;
+        console.log(beneficiary_response);
+        if(!beneficiary_response.success)
+        {
+          return beneficiary_response;
+        }
+
+        // Backers 
+        for (let i = 0; i < txn_inputs.backers.length; i++)
+        {
+          opt_in_acc['address'] = txn_inputs.backers[i].address;
+          opt_in_acc['mnemonic'] = txn_inputs.backers[i].mnemonic;
+          opt_in_res = await this.optIn(opt_in_acc);
+          console.log(opt_in_res);
+
+          backer_response = await this.invest(txn_inputs.backers[i], INVESTOR_TYPE.BACKER);
+          console.log(backer_response);
+        }
+
+        //Add Beneficiary
+        return response_obj;
     }
 
     /**
@@ -329,6 +348,7 @@ class FidelisContracts {
         let sender_addr = "";
         let sender_mnemonic = "";
         let sender_acc = null;
+        let investor_desc = '';
         let response_obj = {
             'success': false
         };
@@ -356,14 +376,17 @@ class FidelisContracts {
                     sender_addr = txn_inputs.receiver_address;
                     sender_mnemonic = txn_inputs.receiver_mnemonic;
                     sender_acc = algosdk.mnemonicToSecretKey(sender_mnemonic);
+                    investor_desc = 'beneficiary';
                     
                     break;
 
                 case INVESTOR_TYPE.BACKER:
                     assets.push(parseInt(process.env.BACKER_TOKEN_RESERVE_ASSETID));
                     args.push(new Uint8Array(Buffer.from(txn_inputs.points)));
+                    sender_addr = txn_inputs.address;
                     sender_mnemonic = txn_inputs.mnemonic;
                     sender_acc = algosdk.mnemonicToSecretKey(sender_mnemonic);
+                    investor_desc = 'backer';
 
                     break;
 
@@ -376,7 +399,7 @@ class FidelisContracts {
 
             let params = await algodClient.getTransactionParams().do();
     
-            console.log(`Adding Recipient ...`);
+            console.log(`Adding ${investor_desc} ...`);
     
             let  txn = algosdk.makeApplicationNoOpTxn(sender_addr, params, this.contract_id, args, [], [], assets);
 
@@ -384,6 +407,7 @@ class FidelisContracts {
     
             // Sign the transaction
             
+            let sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
             let signedTxn = txn.signTxn(sender_acc.sk);
             console.log("Signed transaction with txID: %s", txId);
     
@@ -396,11 +420,11 @@ class FidelisContracts {
             // print the app-id
             let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
             let appId = transactionResponse['application-index'];
-            console.log(`Added ${investor_type} for app-id: `, this.contract_id);
+            console.log(`Added ${investor_desc} for app-id: `, this.contract_id);
     
             response_obj['success'] = true;
             response_obj['contract_id'] = this.contract_id;
-            response_obj['description'] = `Successfully added ${investor_type}`;
+            response_obj['description'] = `Successfully added ${investor_desc}`;
     
             } 
             
@@ -417,7 +441,7 @@ class FidelisContracts {
                 else
                 {
                     //TODO: Handle errors unrelated to network
-                    response_obj['description']= `Could not add ${investor_type}`;
+                    response_obj['description']= `Could not add ${investor_desc}`;
                     console.log(err);
     
                 }
@@ -509,9 +533,9 @@ class FidelisContracts {
             'success': false
         };
         try {
-            const localInts = 0
-            const localBytes = 0
-            const globalInts = 2
+            const localInts = 2
+            const localBytes = 1
+            const globalInts = 3
             const globalBytes = 12
     
             let op = "apply";
@@ -530,12 +554,12 @@ class FidelisContracts {
             args.push(new Uint8Array(Buffer.from(interest)));
             args.push(new Uint8Array(Buffer.from(start_date)));
             args.push(new Uint8Array(Buffer.from(end_date)));
-            args.push(new Uint8Array(Buffer.from(reserve_address)));
-            args.push(new Uint8Array(Buffer.from(pool_address)));
-            args.push(new Uint8Array(Buffer.from(txn_inputs.receiver_address)));
-            args.push(new Uint8Array(Buffer.from(txn_inputs.agent_address)));
+            args.push(new Uint8Array(Buffer.from(algosdk.encodeAddress(reserve_address))));
+            args.push(new Uint8Array(Buffer.from(algosdk.encodeAddress(pool_address))));
+            args.push(new Uint8Array(Buffer.from(algosdk.encodeAddress(txn_inputs.receiver_address))));
+            args.push(new Uint8Array(Buffer.from(algosdk.encodeAddress(txn_inputs.agent_address))));
             
-            let accounts = [reserve_address, pool_address];
+            let accounts = [reserve_address, pool_address, txn_inputs.receiver_address, txn_inputs.agent_address];
     
             //let approvalProgramfile = await open(process.env.APPROVAL_TEAL_SOURCE);
             //let clearProgramfile = await open(process.env.CLEAR_TEAL_SOURCE);
@@ -607,21 +631,22 @@ let params = {
     "loan_amount": "50",
     "interest_rate": "1",
     "agent_address": "IQDPRKBXGWTC3UQ25JJOBQVGKQSV3B55XR4YSZV6TPYE5V3XI3S7ZRECHM",
+    "agent_mnemonic": "hurdle crash pair soul issue estate solution economy hospital frog cinnamon enemy reveal like remain interest off token fiber century corn discover predict absent drink",
     "start_date": "1234345",
     "end_date": "16589944",
     "backers": [
         {
-        "points": 2.5,
+        "points": "2.5",
         "address": "V6PZQZ3DPRALNRK6EPPNFRK2NF5DI3VNZBX4C5VEQDCYORSJTK2PYHWQVQ",
         "mnemonic": "lift insane audit subject liar celery wreck mixed crater peace chief forum injury student beyond seven virtual remove outside strong asset shallow supply absent shock",
-        "earned": 2.5
+        "earned": "2.5"
         },
 
         {
-        "points": 2.5,
+        "points": "2.5",
         "address": "6MYSPXEKKMAW4SMTCNXPF3QDTWQBY2Z4YTFXUUYWSLR2EOJHV66XNXLY5E",
         "mnemonic": "arrest hedgehog toilet expose beef powder vast just cost pink coffee round evolve decade shell glare hunt cousin stay pioneer execute close drive able denial",
-        "earned": 2.5
+        "earned": "2.5"
         }
     ]
 }
@@ -629,6 +654,6 @@ let params = {
 let fidelisContracts = new FidelisContracts();
 
 
-fidelisContracts.deploy(params).then((data)=>{
+fidelisContracts.initiationFlow(params).then((data)=>{
     console.log(data);
 })
