@@ -31,6 +31,7 @@ def approval():
         Approve(),
     )
 
+
     # initialize contract
         # loan amount
         # loan balance
@@ -63,7 +64,36 @@ def approval():
         App.globalPut(agent_address, Txn.accounts[4]),
         App.globalPut(stable_token, Txn.assets[0]),
         App.globalPut(loan_state, Bytes('openToInvestment')),
-        App.globalPut(staked_amount, Int(0),
+        App.globalPut(staked_amount, Int(0)),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.AssetTransfer,
+                TxnField.asset_receiver: Global.current_application_address(),
+                TxnField.asset_amount: Int(0),
+                TxnField.xfer_asset: Txn.assets[0],
+                TxnField.sender: Global.current_application_address(),
+            }
+        ),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.AssetTransfer,
+                TxnField.asset_receiver: Global.current_application_address(),
+                TxnField.asset_amount: Int(0),
+                TxnField.xfer_asset: Txn.assets[1],
+                TxnField.sender: Global.current_application_address(),
+            }
+        ),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.AssetTransfer,
+                TxnField.asset_receiver: Global.current_application_address(),
+                TxnField.asset_amount: Int(0),
+                TxnField.xfer_asset: Txn.assets[2],
+                TxnField.sender: Global.current_application_address(),
+            }
+        ),
+        InnerTxnBuilder.Submit(),
         Approve()
     )
 
@@ -78,29 +108,30 @@ def approval():
         inverstorAssetBalance = AssetHolding.balance(Txn.sender(), Txn.assets[0])
         return Seq(
                 Assert(App.globalGet(loan_state) == Bytes('openToInvestment')),
-                #Assert(Btoi(Txn.application_args[1]) + App.globalGet(staked_amount) <= Btoi(App.globalGet(loan_amount))), # The backer ending fails this assertion
+                Assert((Btoi(Txn.application_args[1]) + App.globalGet(staked_amount)) <= App.globalGet(loan_amount)), # The backer ending fails this assertion
                 Assert(Btoi(Txn.application_args[1]) > Int(0)), #check investment amount > 0
                 inverstorAssetBalance,
-                #Assert(inverstorAssetBalance.hasValue()),
-                #Assert(inverstorAssetBalance.value() >= Btoi(Txn.application_args[1])),
+                Assert(inverstorAssetBalance.hasValue()),
+                # Assert(inverstorAssetBalance.value() >= Btoi(Txn.application_args[1])),
                 
-                ### 
-                #InnerTxnBuilder.Begin(),
-                #InnerTxnBuilder.SetFields(
-                #    {
-                #        TxnField.type_enum: TxnType.AssetTransfer,
-                #        TxnField.asset_receiver: Global.current_application_address(),
-                #        TxnField.asset_amount: Btoi(Txn.application_args[1]),
-                #        TxnField.xfer_asset: Txn.assets[0],
-                #        TxnField.sender: Txn.sender() 
-                #    }
-                #),
-                #InnerTxnBuilder.Submit(),
+                ## 
+                InnerTxnBuilder.Begin(),
+                InnerTxnBuilder.SetFields(
+                   {
+                       TxnField.type_enum: TxnType.AssetTransfer,
+                       TxnField.asset_receiver: Global.current_application_address(),
+                       TxnField.asset_amount: Btoi(Txn.application_args[1]),
+                       TxnField.xfer_asset: Txn.assets[0],
+                       TxnField.sender: Txn.sender() 
+                   }
+                ),
+                InnerTxnBuilder.Submit(),
+                
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes("_key")),  Txn.application_args[2]),
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount')),  Btoi(Txn.application_args[1])),
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_asset')),  Txn.assets[0]),
                 App.globalPut(staked_amount, App.globalGet(staked_amount) + Btoi(Txn.application_args[1])),
-                If(App.globalGet(staked_amount) >= Btoi(App.globalGet(loan_amount)))
+                If(App.globalGet(staked_amount) >= App.globalGet(loan_amount))
                 .Then(
                     Seq(
                         App.globalPut(loan_state, Bytes('alive')),
@@ -109,7 +140,7 @@ def approval():
                             {
                                 TxnField.type_enum: TxnType.AssetTransfer,
                                 TxnField.asset_receiver: App.globalGet(agent_address),
-                                TxnField.asset_amount: Btoi(App.globalGet(loan_amount)),
+                                TxnField.asset_amount: App.globalGet(loan_amount),
                                 TxnField.xfer_asset: App.globalGet(stable_token),
                                 TxnField.sender: App.globalGet(pool_address),
                             }

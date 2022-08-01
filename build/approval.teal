@@ -107,15 +107,19 @@ int 100
 app_global_put
 byte "loan_amount"
 txna ApplicationArgs 1
+btoi
 app_global_put
 byte "interest_rate"
 txna ApplicationArgs 2
+btoi
 app_global_put
 byte "start_date"
 txna ApplicationArgs 3
+btoi
 app_global_put
 byte "end_date"
 txna ApplicationArgs 4
+btoi
 app_global_put
 byte "reserve_address"
 txna ApplicationArgs 5
@@ -135,6 +139,41 @@ app_global_put
 byte "loan_state"
 byte "openToInvestment"
 app_global_put
+byte "staked_amount"
+int 0
+app_global_put
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 1
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 2
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
 int 1
 return
 sub0: // invest
@@ -142,6 +181,15 @@ byte "loan_state"
 app_global_get
 byte "openToInvestment"
 ==
+assert
+txna ApplicationArgs 1
+btoi
+byte "staked_amount"
+app_global_get
++
+byte "loan_amount"
+app_global_get
+<=
 assert
 txna ApplicationArgs 1
 btoi
@@ -153,6 +201,21 @@ txna Assets 0
 asset_holding_get AssetBalance
 store 0
 store 1
+load 0
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+txna ApplicationArgs 1
+btoi
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+txn Sender
+itxn_field Sender
+itxn_submit
 txn Sender
 txn ApplicationID
 itob
@@ -186,7 +249,6 @@ byte "staked_amount"
 app_global_get
 byte "loan_amount"
 app_global_get
-btoi
 >=
 bz sub0_l2
 byte "loan_state"
@@ -200,7 +262,6 @@ app_global_get
 itxn_field AssetReceiver
 byte "loan_amount"
 app_global_get
-btoi
 itxn_field AssetAmount
 byte "stable_token"
 app_global_get
