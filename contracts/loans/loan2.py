@@ -17,7 +17,7 @@ def approval():
     loan_state = Bytes('loan_state')
     agent_address = Bytes('agent_address')
     stable_token = Bytes('stable_token')
-
+    manager = Bytes('manager')
 
     # expressions
     force_close = Seq(
@@ -65,35 +65,7 @@ def approval():
         App.globalPut(stable_token, Txn.assets[0]),
         App.globalPut(loan_state, Bytes('openToInvestment')),
         App.globalPut(staked_amount, Int(0)),
-        InnerTxnBuilder.Begin(),
-        InnerTxnBuilder.SetFields(
-            {
-                TxnField.type_enum: TxnType.AssetTransfer,
-                TxnField.asset_receiver: Global.current_application_address(),
-                TxnField.asset_amount: Int(0),
-                TxnField.xfer_asset: Txn.assets[0],
-                TxnField.sender: Global.current_application_address(),
-            }
-        ),
-        InnerTxnBuilder.SetFields(
-            {
-                TxnField.type_enum: TxnType.AssetTransfer,
-                TxnField.asset_receiver: Global.current_application_address(),
-                TxnField.asset_amount: Int(0),
-                TxnField.xfer_asset: Txn.assets[1],
-                TxnField.sender: Global.current_application_address(),
-            }
-        ),
-        InnerTxnBuilder.SetFields(
-            {
-                TxnField.type_enum: TxnType.AssetTransfer,
-                TxnField.asset_receiver: Global.current_application_address(),
-                TxnField.asset_amount: Int(0),
-                TxnField.xfer_asset: Txn.assets[2],
-                TxnField.sender: Global.current_application_address(),
-            }
-        ),
-        InnerTxnBuilder.Submit(),
+        App.globalPut(manager, Txn.sender()),
         Approve()
     )
 
@@ -178,7 +150,43 @@ def approval():
                 Approve(),
             )
 
-    
+    @Subroutine(TealType.none)
+    def escrow_config():
+        # Configuring the escrow account
+        return Seq(
+                Assert(App.globalGet(Bytes("manager")) == Txn.sender()),
+                InnerTxnBuilder.Begin(),
+                InnerTxnBuilder.SetFields(
+                    {
+                        TxnField.type_enum: TxnType.AssetTransfer,
+                        TxnField.asset_receiver: Global.current_application_address(),
+                        TxnField.asset_amount: Int(0),
+                        TxnField.xfer_asset: Txn.assets[0],
+                        TxnField.sender: Global.current_application_address(),
+                    }
+                ),
+                InnerTxnBuilder.SetFields(
+                    {
+                        TxnField.type_enum: TxnType.AssetTransfer,
+                        TxnField.asset_receiver: Global.current_application_address(),
+                        TxnField.asset_amount: Int(0),
+                        TxnField.xfer_asset: Txn.assets[1],
+                        TxnField.sender: Global.current_application_address(),
+                    }
+                ),
+                InnerTxnBuilder.SetFields(
+                    {
+                        TxnField.type_enum: TxnType.AssetTransfer,
+                        TxnField.asset_receiver: Global.current_application_address(),
+                        TxnField.asset_amount: Int(0),
+                        TxnField.xfer_asset: Txn.assets[2],
+                        TxnField.sender: Global.current_application_address(),
+                    }
+                ),
+                InnerTxnBuilder.Submit(),
+            )
+
+
     @Subroutine(TealType.none)
     def repay():
         # allow  account to transfer USDCa tokens to liquidity pool as loan payment
@@ -220,6 +228,7 @@ def approval():
                 [Txn.application_args[0] == Bytes("payment"), repay()],
                 [Txn.application_args[0] == Bytes("reclaim"), reclaim()],
                 [Txn.application_args[0] == Bytes("invest"), invest()],
+                [Txn.application_args[0] == Bytes("config"), escrow_config()],
                 [Txn.application_args[0] == Bytes("force_close"), force_close],
                 [Txn.application_args[0] == Bytes("check_default"), check_default]
             ),
