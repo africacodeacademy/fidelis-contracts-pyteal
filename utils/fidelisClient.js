@@ -1,7 +1,7 @@
 const algosdk = require("algosdk");
 const fs = require("fs/promises");
 const dotenv = require("dotenv");
-const INVESTOR_TYPE = require('../constants/investorTypes');
+const INVESTOR_TYPE = require("../constants/investorTypes");
 
 const walletUtils = require("./wallet");
 
@@ -45,164 +45,6 @@ class FidelisContracts {
     this.contract_id = contract_id;
   }
 
-  async registerAgent(txn_inputs) {
-    let response_obj = {
-      success: false,
-    };
-
-    let response = await this.deploy(txn_inputs);
-    this.contract_id = response.contract_id ?? null;
-
-    if (!this.contract_id) {
-      return response;
-    }
-    try {
-      let op = "register_agent";
-
-      let accounts = [sender, txn_inputs.agent_address];
-      let args = [];
-      args.push(new Uint8Array(Buffer.from(op)));
-      let params = await algodClient.getTransactionParams().do();
-
-      console.log("Registering Agent. . . . ");
-      let txn = algosdk.makeApplicationOptInTxn(
-        sender,
-        params,
-        this.contract_id,
-        args,
-        accounts
-      );
-
-      let txId = txn.txID().toString();
-
-      // Sign the transaction
-      let sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
-      let signedTxn = txn.signTxn(sk);
-      console.log("Signed transaction with txID: %s", txId);
-
-      // Submit the transaction
-      await algodClient.sendRawTransaction(signedTxn).do();
-
-      // Wait for confirmation
-      await algosdk.waitForConfirmation(algodClient, txId, 2);
-
-      // print the app-id
-      let transactionResponse = await algodClient
-        .pendingTransactionInformation(txId)
-        .do();
-      let appId = transactionResponse["application-index"];
-      console.log("Registered agent for app-id: ", this.contract_id);
-
-      response_obj["success"] = true;
-      response_obj["contract_id"] = this.contract_id;
-      response_obj["description"] = "Successfully registered agent";
-    } catch (err) {
-      // If network request, display verbose error
-      if (err.response) {
-        response_obj["message"] = err.response.text;
-        response_obj["status"] = err.response.status;
-        response_obj["description"] = "Network request unsuccessful";
-      } else {
-        //TODO: Handle errors unrelated to network
-        response_obj["description"] = "Could not register agent";
-        console.log(err);
-      }
-    }
-
-    return response_obj;
-  }
-
-  /**
-   *
-   * @param {*} txn_inputs
-   * @returns
-   */
-  async initiate(txn_inputs) {
-    let response_obj = {
-      success: false,
-    };
-
-    let response = await this.registerAgent(txn_inputs);
-
-    if (!response.success) {
-      response_obj["message"] =
-        "Agent needs to be successfully registered first";
-      return response;
-    }
-
-    try {
-      let op = "apply";
-      let assets = [
-        process.env.USDCA_TOKEN_RESERVE_ASSETID,
-        process.env.TRUST_TOKEN_RESERVE_ASSETID,
-        process.env.BACKER_TOKEN_RESERVE_ASSETID,
-      ];
-      let args = [];
-      let accounts = [];
-      accounts.push(txn_inputs.receiver_address);
-      accounts.push(txn_inputs.agent_address);
-      //accounts.push(pool_address);
-      accounts.push(reserve_address);
-      args.push(new Uint8Array(Buffer.from(op)));
-      let params = await algodClient.getTransactionParams().do();
-
-      console.log("Applying for loan. . . . ");
-
-      for (let i = 0; i < txn_inputs.backers.length; i++) {
-        //accounts.push(txn_inputs.backers[i].address);
-      }
-
-      let txn1 = algosdk.makeApplicationNoOpTxn(
-        sender,
-        params,
-        this.contract_id,
-        args,
-        accounts,
-        [],
-        [20]
-      );
-
-      //First transaction beneficiary
-      //Backers
-
-      let txId = txn1.txID().toString();
-
-      // Sign the transaction
-      let sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
-      let signedTxn1 = txn1.signTxn(sk);
-      console.log("Signed transaction with txID: %s", txId);
-
-      // Submit the transaction
-      await algodClient.sendRawTransaction([signedTxn1]).do();
-
-      // Wait for confirmation
-      await algosdk.waitForConfirmation(algodClient, txId, 2);
-
-      // print the app-id
-      let transactionResponse = await algodClient
-        .pendingTransactionInformation(txId)
-        .do();
-      let appId = transactionResponse["application-index"];
-      console.log("modified app with app-id: ", appId);
-
-      response_obj["success"] = true;
-      response_obj["contract_id"] = appId;
-      response_obj["description"] = "Successfully applied for loan";
-    } catch (err) {
-      // If network request, display verbose error
-      if (err.response) {
-        response_obj["message"] = err.response.text;
-        response_obj["status"] = err.response.status;
-        response_obj["description"] = "Network request unsuccessful";
-      } else {
-        //TODO: Handle errors unrelated to network
-        response_obj["description"] = "Could not apply for loan";
-        console.log(err);
-      }
-    }
-
-    return response_obj;
-  }
 
   /**
    *
@@ -275,67 +117,55 @@ class FidelisContracts {
     }
   }
 
-    /**
-     * 
-     * @param {*} txn_inputs 
-     * @returns 
-     */
-    async initiationFlow(txn_inputs)
+  /**
+   *
+   * @param {*} txn_inputs
+   * @returns
+   */
+  async initiationFlow(txn_inputs) {
+    let response_obj = {
+      success: false,
+    };
+    let backer_response = null;
+    let deploy_response = await this.deploy(txn_inputs);
+    console.log(deploy_response);
+    if (deploy_response.success) {
+      this.contract_id = deploy_response.contract_id;
+    } else {
+      return deploy_response;
+    }
+
+    // Beneficiary opt in
+    let opt_in_acc = {
+      address: txn_inputs.receiver_address,
+      mnemonic: txn_inputs.receiver_mnemonic,
+    };
+
+    let opt_in_res = await this.optIn(opt_in_acc);
+    console.log(opt_in_res);
+
+    let beneficiary_response = await this.invest(txn_inputs, INVESTOR_TYPE.BENEFICIARY);
+    console.log(beneficiary_response);
+    if(!beneficiary_response.success)
     {
-        let response_obj = {
-            'success': false
-        };
-        let backer_response = null;
-        let deploy_response = await this.deploy(txn_inputs);
-        console.log(deploy_response);
-        if(deploy_response.success)
-        {
-          this.contract_id = deploy_response.contract_id;
-        }
+      return beneficiary_response;
+    }
 
-        else
-        {
-          return deploy_response;
-        }
+    // Backers 
+    for (let i = 0; i < txn_inputs.backers.length; i++)
+    {
+      opt_in_acc['address'] = txn_inputs.backers[i].address;
+      opt_in_acc['mnemonic'] = txn_inputs.backers[i].mnemonic;
+      opt_in_res = await this.optIn(opt_in_acc);
+      console.log(opt_in_res);
 
+      backer_response = await this.invest(txn_inputs.backers[i], INVESTOR_TYPE.BACKER);
+      console.log(backer_response);
 
-        // Beneficiary opt in
-        let opt_in_acc = {
-            address: txn_inputs.receiver_address,
-            mnemonic: txn_inputs.receiver_mnemonic
-        }
+    }
 
-        let opt_in_res = await this.optIn(opt_in_acc);
-        console.log(opt_in_res);
-
-        //agent opt in
-        /*opt_in_acc['address'] = txn_inputs.agent_address;
-        opt_in_acc['mnemonic'] = txn_inputs.agent_mnemonic;
-        opt_in_res = await this.optIn(opt_in_acc);
-        console.log(opt_in_res);*/
-
-        let beneficiary_response = await this.invest(txn_inputs, INVESTOR_TYPE.BENEFICIARY);
-        console.log(beneficiary_response);
-        if(!beneficiary_response.success)
-        {
-          return beneficiary_response;
-        }
-
-        // Backers 
-        for (let i = 0; i < txn_inputs.backers.length; i++)
-        {
-          opt_in_acc['address'] = txn_inputs.backers[i].address;
-          opt_in_acc['mnemonic'] = txn_inputs.backers[i].mnemonic;
-          opt_in_res = await this.optIn(opt_in_acc);
-          console.log(opt_in_res);
-
-          backer_response = await this.invest(txn_inputs.backers[i], INVESTOR_TYPE.BACKER);
-          console.log(backer_response);
-
-        }
-
-        //Add Beneficiary
-        return response_obj;
+    //Add Beneficiary
+    return response_obj;
     }
 
     /**
@@ -452,83 +282,72 @@ class FidelisContracts {
         
         return response_obj;
 
+  }
+
+
+  async optIn(txn_inputs) {
+    let response_obj = {
+      success: false,
+    };
+    let sender_addr = txn_inputs.address;
+    let sender_mnemonic = txn_inputs.mnemonic;
+    let sk = "";
+
+    if (sender_mnemonic !== "") {
+      sk = algosdk.mnemonicToSecretKey(sender_mnemonic).sk;
+    } else {
+      sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
     }
 
-    async optIn(txn_inputs)
-    {
-        let response_obj = {
-            'success': false
-        };
-        let sender_addr = txn_inputs.address;
-        let sender_mnemonic = txn_inputs.mnemonic;
-        let sk = '';
-        
-        if(sender_mnemonic !== "")
-        {
-           sk = algosdk.mnemonicToSecretKey(sender_mnemonic).sk;
-        }
-        else
-        {
-            sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
-        }
+    try {
+      let params = await algodClient.getTransactionParams().do();
 
+      console.log(`Opting in ...`);
 
-        try
-        {
-            let params = await algodClient.getTransactionParams().do();
-    
-            console.log(`Opting in ...`);
-    
-            let  txn = algosdk.makeApplicationOptInTxn(sender_addr, params, this.contract_id);
-    
-            let txId = txn.txID().toString();
-    
-            // Sign the transaction
-            
-            let signedTxn = txn.signTxn(sk);
-            console.log("Signed transaction with txID: %s", txId);
-    
-            // Submit the transaction
-            await algodClient.sendRawTransaction(signedTxn).do();
-    
-            // Wait for confirmation
-            await algosdk.waitForConfirmation(algodClient, txId, 2);
-    
-            // print the app-id
-            let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
-            let appId = transactionResponse['application-index'];
-            console.log(`opted in`);
-    
-            response_obj['success'] = true;
-            response_obj['contract_id'] = this.contract_id;
-            response_obj['description'] = `Successfully opted in`;
-    
-        }
+      let txn = algosdk.makeApplicationOptInTxn(
+        sender_addr,
+        params,
+        this.contract_id
+      );
 
-        catch (err) {
-            // If network request, display verbose error
-            if (err.response) {
+      let txId = txn.txID().toString();
 
-                response_obj['message'] = err.response.text;
-                response_obj['status'] = err.response.status
-                response_obj['description']= 'Network request unsuccessful';
-                
-            }
+      // Sign the transaction
 
-            else
-            {
-                //TODO: Handle errors unrelated to network
-                response_obj['description']= `Could not opt in`;
-                console.log(err);
+      let signedTxn = txn.signTxn(sk);
+      console.log("Signed transaction with txID: %s", txId);
 
-            }
+      // Submit the transaction
+      await algodClient.sendRawTransaction(signedTxn).do();
+
+      // Wait for confirmation
+      await algosdk.waitForConfirmation(algodClient, txId, 2);
+
+      // print the app-id
+      let transactionResponse = await algodClient
+        .pendingTransactionInformation(txId)
+        .do();
+      let appId = transactionResponse["application-index"];
+      console.log(`opted in`);
+
+      response_obj["success"] = true;
+      response_obj["contract_id"] = this.contract_id;
+      response_obj["description"] = `Successfully opted in`;
+    } catch (err) {
+      // If network request, display verbose error
+      if (err.response) {
+        response_obj["message"] = err.response.text;
+        response_obj["status"] = err.response.status;
+        response_obj["description"] = "Network request unsuccessful";
+      } else {
+        //TODO: Handle errors unrelated to network
+        response_obj["description"] = `Could not opt in`;
+        console.log(err);
+      }
     }
 
     return response_obj;
-    }
-
-
-
+  }
 
     async deploy (txn_inputs) {
  
@@ -654,7 +473,9 @@ let params = {
 
 let fidelisContracts = new FidelisContracts();
 
+fidelisContracts.initiationFlow(params).then((data) => {
+  console.log(data);
+});
 
-fidelisContracts.initiationFlow(params).then((data)=>{
-    console.log(data);
-})
+
+
