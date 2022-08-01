@@ -165,6 +165,8 @@ def approval():
                         TxnField.sender: Global.current_application_address(),
                     }
                 ),
+                InnerTxnBuilder.Submit(),
+                InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields(
                     {
                         TxnField.type_enum: TxnType.AssetTransfer,
@@ -174,6 +176,8 @@ def approval():
                         TxnField.sender: Global.current_application_address(),
                     }
                 ),
+                InnerTxnBuilder.Submit(),
+                InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields(
                     {
                         TxnField.type_enum: TxnType.AssetTransfer,

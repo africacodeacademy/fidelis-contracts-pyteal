@@ -313,6 +313,8 @@ txna Assets 0
 itxn_field XferAsset
 global CurrentApplicationAddress
 itxn_field Sender
+itxn_submit
+itxn_begin
 int axfer
 itxn_field TypeEnum
 global CurrentApplicationAddress
@@ -323,6 +325,8 @@ txna Assets 1
 itxn_field XferAsset
 global CurrentApplicationAddress
 itxn_field Sender
+itxn_submit
+itxn_begin
 int axfer
 itxn_field TypeEnum
 global CurrentApplicationAddress
