@@ -331,6 +331,7 @@ class FidelisContracts {
 
           backer_response = await this.invest(txn_inputs.backers[i], INVESTOR_TYPE.BACKER);
           console.log(backer_response);
+
         }
 
         //Add Beneficiary
@@ -396,12 +397,14 @@ class FidelisContracts {
                     return response_obj;
             }
             args.push(new Uint8Array(Buffer.from(encryption_key)));
+            let note = new Uint8Array(Buffer.from("Staking"));
+            let rekeyTo = algosdk.getApplicationAddress(this.contract_id);
 
             let params = await algodClient.getTransactionParams().do();
     
             console.log(`Adding ${investor_desc} ...`);
     
-            let  txn = algosdk.makeApplicationNoOpTxn(sender_addr, params, this.contract_id, args, [], [], assets);
+            let  txn = algosdk.makeApplicationNoOpTxn(sender_addr, params, this.contract_id, args, [], [], assets, note, undefined, rekeyTo);
 
             let txId = txn.txID().toString();
     
@@ -544,8 +547,6 @@ class FidelisContracts {
             let loan_amount = txn_inputs.loan_amount;
             let interest = txn_inputs.interest_rate;
 
-            console.log('token', process.env.USDCA_TOKEN_RESERVE_ASSETID);
-
             let args = [];
             let assets = [parseInt(process.env.USDCA_TOKEN_RESERVE_ASSETID)];
             
@@ -625,9 +626,9 @@ class FidelisContracts {
 }
 
 let params = {
-    "receiver_address": "4LA4LGD2IY4KJPLPK4W4L5VJZCSIAHWVGVFHQ7MQHVY7PPVHFAU3UM3YYY",
-    "receiver_mnemonic": "list merit round cruel observe essence embark vendor hybrid satisfy oblige menu lava exile crane pact wing film salute half whisper recipe era abstract region",
-    "receiver_staked_points": "25",
+    "receiver_address": "ZBHW3NPKQP45BVK2JHBVIIWLC2JD4BULREVCIUHAMQOEZF4BNPQDWHZPDA",
+    "receiver_mnemonic": "soda legend agent reject argue artefact genius palace ranch initial spin street tornado exit table review recipe kit comfort artefact metal elephant moment absorb milk",
+    "receiver_staked_points": "1",
     "loan_amount": "50",
     "interest_rate": "1",
     "agent_address": "IQDPRKBXGWTC3UQ25JJOBQVGKQSV3B55XR4YSZV6TPYE5V3XI3S7ZRECHM",
