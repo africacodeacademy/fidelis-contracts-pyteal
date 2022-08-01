@@ -101,16 +101,8 @@ btoi
 >
 assert
 byte "balance"
-txna ApplicationArgs 1
+txna ApplicationArgs 5
 btoi
-txna ApplicationArgs 1
-btoi
-txna ApplicationArgs 2
-btoi
-int 100
-/
-*
-+
 app_global_put
 byte "loan_amount"
 txna ApplicationArgs 1
@@ -128,17 +120,14 @@ byte "end_date"
 txna ApplicationArgs 4
 btoi
 app_global_put
-byte "reserve_address"
-txna ApplicationArgs 5
-app_global_put
 byte "pool_address"
-txna ApplicationArgs 6
+txna Accounts 1
 app_global_put
 byte "beneficiary"
-txna ApplicationArgs 7
+txna Accounts 2
 app_global_put
 byte "agent_address"
-txna Accounts 4
+txna Accounts 3
 app_global_put
 byte "stable_token"
 txna Assets 0
