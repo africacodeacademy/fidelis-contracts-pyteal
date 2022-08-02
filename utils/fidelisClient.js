@@ -92,6 +92,28 @@ class FidelisContracts {
     let opt_in_res = await this.optIn(opt_in_acc);
     console.log(opt_in_res);
 
+    // Agent opt into application
+    opt_in_acc = {
+      address: txn_inputs.agent_address,
+      mnemonic: txn_inputs.agent_mnemonic,
+    };
+
+    opt_in_res = await this.optIn(opt_in_acc);
+    console.log(opt_in_res);
+
+    // Agent opt into USDCa
+    let agent_acc = {
+      address: txn_inputs.agent_address,
+      mnemonic:  txn_inputs.agent_mnemonic
+    }
+
+    let asset_opt_in = await this.optIntoAsset(agent_acc, process.env.USDCA_TOKEN_RESERVE_ASSETID);
+    if(!asset_opt_in.success)
+    {
+      return asset_opt_in;
+    }
+
+    //Beneficiary invest;
     let beneficiary_response = await this.invest(
       txn_inputs,
       INVESTOR_TYPE.BENEFICIARY
@@ -240,12 +262,77 @@ class FidelisContracts {
   }
 
   /**
-   * Opt in investor[either backer or beneficiary]
-   * @param {*} txn_inputs
-   * @returns
+   * 
+   * @param {*} account_params 
+   * @param {*} asset_id 
    */
-  async optIn(txn_inputs) {
-    this.contract_id = 102710841;
+  async optIntoAsset(account_params, asset_id)
+  {
+    let response_obj = {
+      success: false,
+    };
+
+    try
+    {
+      let params = await algodClient.getTransactionParams().do();
+      let sk = algosdk.mnemonicToSecretKey(account_params.mnemonic).sk;
+
+      let optinTxn_sender = account_params.address;
+      let optinTxn_recipient = account_params.address;
+      let closeRemainderTo = undefined;
+      let revocationTarget = undefined;
+      let optin_amount = 0;
+  
+      let opttxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+        optinTxn_sender,
+        optinTxn_recipient,
+        closeRemainderTo,
+        revocationTarget,
+        optin_amount,
+        enc.encode("optin txn"),
+        asset_id,
+        params
+      );
+  
+      rawSignedTxn = opttxn.signTxn(sk);
+      let ctx = await algodClient.sendRawTransaction(rawSignedTxn).do();
+  
+      let confirmedTxn = await algosdk.waitForConfirmation(
+        algodClient,
+        ctx.txId,
+        4
+      );
+
+      response_obj["success"] = true;
+      
+      response_obj["description"] = `Account successfully opten into asset ${asset_id}`;
+    }
+
+    catch(err)
+    {
+      // If network request, display verbose error
+      if (err.response) {
+        response_obj["message"] = err.response.text;
+        response_obj["status"] = err.response.status;
+        response_obj["description"] = "Network request unsuccessful";
+      } else {
+        //TODO: Handle errors unrelated to network
+        response_obj["description"] = `Could not opt account into asset ${asset_id}`;
+        console.log(err);
+      }
+    }
+
+  }
+
+  /**
+   * 
+   * @param {*} txn_inputs 
+   * @param {*} contract_id 
+   * @returns 
+   */
+  async optIn(txn_inputs, contract_id = null) {
+
+    this.contract_id = !contract_id ? this.contract_id : contract_id;
     let response_obj = {
       success: false,
     };
@@ -358,7 +445,7 @@ class FidelisContracts {
       response_obj["success"] = true;
       response_obj["contract_id"] = contract_id;
       response_obj["description"] =
-        "Successfully created Fidelis tokens for escrow";
+        "Successfully opted Fidelis tokens into escrow";
     } catch (err) {
       // If network request, display verbose error
       if (err.response) {
@@ -369,7 +456,7 @@ class FidelisContracts {
         //TODO: Handle errors unrelated to network
         response_obj[
           "description"
-        ] = `Could not create the fidelis tokens for escow, please check the logs`;
+        ] = `Could not opt in the fidelis tokens to escow, please check the logs`;
         console.log(err);
       }
     }
