@@ -119,21 +119,37 @@ class FidelisContracts {
   }
 
   /**
-   *
-   * @param {*} txn_inputs
-   * @returns
+   * 
+   * @param {*} txn_inputs 
+   * @param {*} contract_id supplied only when the contract is deployed
+   * @returns 
    */
-  async initiationFlow(txn_inputs) {
+  async initiationFlow(txn_inputs, contract_id=null) {
     let response_obj = {
       success: false,
     };
     let backer_response = null;
-    let deploy_response = await this.deploy(txn_inputs);
-    console.log(deploy_response);
-    if (deploy_response.success) {
-      this.contract_id = deploy_response.contract_id;
-    } else {
-      return deploy_response;
+
+    if(!contract_id)
+    {
+      let deploy_response = await this.deploy(txn_inputs);
+      console.log(deploy_response);
+      if (deploy_response.success) {
+        this.contract_id = deploy_response.contract_id;
+      } else {
+        return deploy_response;
+      }
+    }
+    else
+    {
+      this.contract_id = contract_id;
+    }
+
+    // Opt in escrow
+    let escrow_response = await escrowOptIn(this.contract_id);
+    if(!escrow_response.success)
+    {
+      return escrow_response;
     }
 
     // Beneficiary opt in
@@ -165,7 +181,6 @@ class FidelisContracts {
 
     }
 
-    //Add Beneficiary
     return response_obj;
     }
 
@@ -259,7 +274,7 @@ class FidelisContracts {
     
             response_obj['success'] = true;
             response_obj['contract_id'] = contract_id;
-            response_obj['description'] = `Successfully added ${investor_desc}`;
+            response_obj['description'] = `Successfully staked points for ${investor_desc} with address ${sender_addr}`;
     
             } 
             
@@ -276,7 +291,7 @@ class FidelisContracts {
                 else
                 {
                     //TODO: Handle errors unrelated to network
-                    response_obj['description']= `Could not add ${investor_desc}`;
+                    response_obj['description']= `Could not staake points for ${investor_desc} with address ${sender_addr}`;
                     console.log(err);
     
                 }
@@ -287,20 +302,18 @@ class FidelisContracts {
   }
 
 
+  /**
+   * Opt in investor[either backer or beneficiary]
+   * @param {*} txn_inputs 
+   * @returns 
+   */
   async optIn(txn_inputs) {
-    this.contract_id = 102416008; //needs change
     let response_obj = {
       success: false,
     };
     let sender_addr = txn_inputs.address;
     let sender_mnemonic = txn_inputs.mnemonic;
-    let sk = "";
-
-    if (sender_mnemonic !== "") {
-      sk = algosdk.mnemonicToSecretKey(sender_mnemonic).sk;
-    } else {
-      sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
-    }
+    let sk = algosdk.mnemonicToSecretKey(sender_mnemonic).sk;
 
     try {
       let params = await algodClient.getTransactionParams().do();
@@ -335,7 +348,7 @@ class FidelisContracts {
 
       response_obj["success"] = true;
       response_obj["contract_id"] = this.contract_id;
-      response_obj["description"] = `Successfully opted in`;
+      response_obj["description"] = `Investor successfully opten in`;
     } catch (err) {
       // If network request, display verbose error
       if (err.response) {
@@ -352,9 +365,13 @@ class FidelisContracts {
     return response_obj;
   }
 
-  async escrowOptIn()
+  /**
+   * 
+   * @param {*} contract_id 
+   * @returns 
+   */
+  async escrowOptIn(contract_id)
   {
-    let contract_id = 102416008;
       let response_obj = {
         'success': false
     };
@@ -369,7 +386,7 @@ class FidelisContracts {
       
       let params = await algodClient.getTransactionParams().do();
     
-      console.log(`opting in ...`);
+      console.log(`Creating Fidelis Tokens for escrow ...`);
 
       let  txn = algosdk.makeApplicationNoOpTxn(sender, params, contract_id, args, [], [], assets);
 
@@ -390,12 +407,8 @@ class FidelisContracts {
       let appId = transactionResponse['application-index'];
       //console.log(transactionResponse);
       response_obj['success'] = true;
-      response_obj['contract_id'] = appId;
-      response_obj['description'] = 'Successfully opten in';
-
-
-
-      
+      response_obj['contract_id'] = contract_id;
+      response_obj['description'] = 'Successfully created Fidelis tokens for escrow';
       
     } catch (err) {
       // If network request, display verbose error
@@ -405,7 +418,7 @@ class FidelisContracts {
         response_obj["description"] = "Network request unsuccessful";
       } else {
         //TODO: Handle errors unrelated to network
-        response_obj["description"] = `Could not opt in`;
+        response_obj["description"] = `Could not create the fidelis tokens for escow, please check the logs`;
         console.log(err);
       }
     }
@@ -413,6 +426,11 @@ class FidelisContracts {
     return response_obj;
   }
 
+  /**
+   * 
+   * @param {*} txn_inputs 
+   * @returns 
+   */
     async deploy (txn_inputs) {
  
         let response_obj = {
@@ -490,7 +508,8 @@ class FidelisContracts {
               algosdk.getApplicationAddress(appId)
             );
 
-             console.log(seed_response);
+             console.log('pool error', seed_response['pool-error']);
+             response_obj['pool_error'] = seed_response['pool-error'];
     
             } catch (err) {
                 // If network request, display verbose error
