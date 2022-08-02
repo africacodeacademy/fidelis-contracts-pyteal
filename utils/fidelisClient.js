@@ -48,77 +48,6 @@ class FidelisContracts {
 
 
   /**
-   *
-   * @param {*} txn_inputs
-   * @returns
-   */
-  async buildGroupTxn(
-    backers,
-    backerAssetId,
-    beneficiary,
-    trustAssetId,
-    receiver_address
-  ) {
-    let response_obj = {
-      success: false,
-    };
-
-    // let response = await this.registerAgent(txn_inputs);
-
-    let txns = [];
-    // get suggested parameters
-    const suggestedParams = await client.getTransactionParams().do();
-
-    let backerTxns = backers.map((backer) => {
-      return algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-        from: backer.address,
-        note: "fidelis backing transaction",
-        suggestedParams: suggestedParams,
-        to: receiver_address,
-        closeRemainderTo: backer.address,
-        amount: backer.points,
-        assetIndex: backerAssetId,
-        revocationTarget: undefined,
-        rekeyTo: undefined,
-      });
-    });
-
-    let beneficiaryStakeTxn =
-      algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-        from: beneficiary.address,
-        note: "fidelis backing transaction",
-        suggestedParams: suggestedParams,
-        to: receiver_address,
-        closeRemainderTo: beneficiary.address,
-        amount: beneficiary.points,
-        assetIndex: trustAssetId,
-        revocationTarget: undefined,
-        rekeyTo: undefined,
-      });
-
-    txns.push(beneficiaryStakeTxn);
-    txns = txns.concat(backerTxns);
-
-    // assign group id to transactions
-    algosdk.assignGroupID(txns);
-
-    beneficiaryStakeTxn = txns[0];
-    let beneficiarySk = await walletUtils.getSk(beneficiaryStakeTxn.from);
-
-    const signedBeneficiaryTxn = beneficiaryStakeTxn.signTxn(beneficiarySk);
-    var signedTxns = [];
-    signedTxns.push(signedBeneficiaryTxn);
-
-    for (let index = 1; index < txns.length; index++) {
-      let txn = txns[index];
-      //get txn address sk
-      let sk = await walletUtils.getSk(txn.from);
-      txn = txn.signTxn(sk);
-      signedTxns.push(txn);
-    }
-  }
-
-  /**
    * 
    * @param {*} txn_inputs 
    * @param {*} contract_id supplied only when the contract is deployed
@@ -146,7 +75,7 @@ class FidelisContracts {
     }
 
     // Opt in escrow
-    let escrow_response = await escrowOptIn(this.contract_id);
+    let escrow_response = await this.escrowOptIn(this.contract_id);
     if(!escrow_response.success)
     {
       return escrow_response;
@@ -308,6 +237,7 @@ class FidelisContracts {
    * @returns 
    */
   async optIn(txn_inputs) {
+    this.contract_id = 102566748;
     let response_obj = {
       success: false,
     };
@@ -318,7 +248,7 @@ class FidelisContracts {
     try {
       let params = await algodClient.getTransactionParams().do();
 
-      console.log(`Opting in ...`);
+      console.log(`Investor Opting in ...`);
 
       let txn = algosdk.makeApplicationOptInTxn(
         sender_addr,
@@ -386,7 +316,7 @@ class FidelisContracts {
       
       let params = await algodClient.getTransactionParams().do();
     
-      console.log(`Creating Fidelis Tokens for escrow ...`);
+      console.log(`Opting escrow into fidelis tokens ...`);
 
       let  txn = algosdk.makeApplicationNoOpTxn(sender, params, contract_id, args, [], [], assets);
 
@@ -453,7 +383,7 @@ class FidelisContracts {
             let assets = [parseInt(process.env.USDCA_TOKEN_RESERVE_ASSETID), parseInt(process.env.TRUST_TOKEN_RESERVE_ASSETID), parseInt(process.env.BACKER_TOKEN_RESERVE_ASSETID)];
             
             args.push(new Uint8Array(Buffer.from(op)));
-            args.push("50");
+            args.push(new Uint8Array(Buffer.from(balance)));
             args.push(new Uint8Array(Buffer.from(interest)));
             args.push(new Uint8Array(Buffer.from(start_date)));
             args.push(new Uint8Array(Buffer.from(end_date)));
@@ -524,7 +454,7 @@ class FidelisContracts {
                 else
                 {
                     //TODO: Handle errors unrelated to network
-                    response_obj['description']= 'Could not deploy contract';
+                    response_obj['description']= 'Could not deploy contract, check th application logs for more information';
                     console.log(err);
     
                 }
@@ -564,38 +494,37 @@ let params = {
 let fidelisContracts = new FidelisContracts();
 
 
+// fidelisContracts.initiationFlow(params, 102566748).then((data) => {
+//   console.log(data);
+// });
+
 // fidelisContracts.deploy(params).then((data) => {
 //   console.log(data);
 // });
 
-// fidelisContracts.escrowOptIn().then((data) => {
+
+// fidelisContracts.escrowOptIn(102566748).then((data) => {
 //   console.log(data);
 // });
 
 
-// fidelisContracts.optIn(
-//   {
-//     address: "ZBHW3NPKQP45BVK2JHBVIIWLC2JD4BULREVCIUHAMQOEZF4BNPQDWHZPDA",
-//     mnemonic: "soda legend agent reject argue artefact genius palace ranch initial spin street tornado exit table review recipe kit comfort artefact metal elephant moment absorb milk",
-//   }
-// ).then((data) => {
-//   console.log(data);
-// });
+ fidelisContracts.optIn(
+  {
+    address: "ZBHW3NPKQP45BVK2JHBVIIWLC2JD4BULREVCIUHAMQOEZF4BNPQDWHZPDA",
+    mnemonic: "soda legend agent reject argue artefact genius palace ranch initial spin street tornado exit table review recipe kit comfort artefact metal elephant moment absorb milk",
+  }
+).then((data) => {
+  console.log(data);
+});
 
 // fidelisContracts.invest(
 //   {
 //     receiver_address: "ZBHW3NPKQP45BVK2JHBVIIWLC2JD4BULREVCIUHAMQOEZF4BNPQDWHZPDA",
 //     receiver_mnemonic: "soda legend agent reject argue artefact genius palace ranch initial spin street tornado exit table review recipe kit comfort artefact metal elephant moment absorb milk",
 //     receiver_staked_points: "1"
-//   }, INVESTOR_TYPE.BENEFICIARY, 102416008
+//   }, INVESTOR_TYPE.BENEFICIARY, 102554997
 // ).then((data) => {
 //   console.log(data);
 // });
-
-let args = [];
-args.push(new Uint8Array(Buffer.from("16589944")));
-
- console.log(args);
-
 
 
