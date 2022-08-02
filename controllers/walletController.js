@@ -1,13 +1,12 @@
-const  walletUtils = require("../utils/wallet")
-const  transactionUtils = require("../utils/transaction")
-const errorUtils =  require("../utils/error")
+const walletUtils = require("../utils/wallet");
+const transactionUtils = require("../utils/transaction");
+const errorUtils = require("../utils/error");
 
 /**
  * register user wallet
  */
- exports.registerUserWallet = async(req, res, next) => {
-
-    /**
+exports.registerUserWallet = async (req, res, next) => {
+  /**
      * #swagger.tags = ['Wallet / Account']
      * #swagger.summary = 'Register'
      * #swagger.description = 'Endpoint creates new user wallets and accounts on the blockchain, 
@@ -36,30 +35,25 @@ const errorUtils =  require("../utils/error")
         schema: {$ref:'#/components/schemas/Wallet'}
     }  
      */
-    try {  
-        const {
-            uniqueIdentifier
-        } = req.body
+  try {
+    const { uniqueIdentifier } = req.body;
 
-        var wallet = await walletUtils.createWallet(uniqueIdentifier)
+    var wallet = await walletUtils.createWallet(uniqueIdentifier);
 
-        return res.send(wallet)
-
-    }
-    catch (err) {
-        err = errorUtils.errorParser(err)
-        res.status(400).send(err)
-        // return next(err)
-    }
-}
-
+    return res.send(wallet);
+  } catch (err) {
+    err = errorUtils.errorParser(err);
+    res.status(400).send(err);
+    // return next(err)
+  }
+};
 
 /**
  * getWalletDetails
- * 
+ *
  */
-exports.getWalletDetails = async(req, res, next) => {
-    /**
+exports.getWalletDetails = async (req, res, next) => {
+  /**
      * #swagger.tags = ['Wallet / Account']
      * #swagger.summary = 'Get wallet'
      * #swagger.description = 'Endpoint takes a wallet address and returns wallet information  for the given address'
@@ -75,30 +69,26 @@ exports.getWalletDetails = async(req, res, next) => {
         schema: {$ref:'#/components/schemas/Wallet'}
     }  
      */
-    try {  
-        const {
-            addr
-        } = req.query
+  try {
+    const { addr } = req.query;
 
-        var wallet = await walletUtils.getWalletInfo(addr)
+    var wallet = await walletUtils.getWalletInfo(addr);
 
-        return res.send(wallet)
-
-    }
-    catch (err) {
-        console.log("err", Object.keys(err));
-        err = errorUtils.errorParser(err)
-        res.status(500).json({"ERROR": err})
-        // return next(err)
-    }
-}
+    return res.send(wallet);
+  } catch (err) {
+    console.log("err", Object.keys(err));
+    err = errorUtils.errorParser(err);
+    res.status(500).json({ ERROR: err });
+    // return next(err)
+  }
+};
 
 /**
  * getWallets
- * 
+ *
  */
-exports.getWallets = async(req, res, next) => {
-    /**
+exports.getWallets = async (req, res, next) => {
+  /**
      * #swagger.tags = ['Wallet / Account']
      * #swagger.summary = 'Retrieve wallets'
      * #swagger.description = 'Use this endpoint to get a list of all platform wallets that are on the blockchain'
@@ -108,31 +98,28 @@ exports.getWallets = async(req, res, next) => {
         schema: {$ref:'#/components/schemas/Wallet'}
     }  
      */
-    try {  
-        
-        var wallets = await walletUtils.getAllWallets()
+  try {
+    var wallets = await walletUtils.getAllWallets();
 
-        return res.send(wallets)
-
-    }
-    catch (err) {
-        console.log("err", err);
-        err = errorUtils.errorParser(err)
-        res.status(500).json({"ERROR": err})
-        // return next(err)
-    }
-}
+    return res.send(wallets);
+  } catch (err) {
+    console.log("err", err);
+    err = errorUtils.errorParser(err);
+    res.status(500).json({ ERROR: err });
+    // return next(err)
+  }
+};
 
 /**
  * fetchAccountTransactions
- * 
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- * @returns 
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
  */
-exports.fetchAccountTransactions = async(req, res, next) => {
-    /**
+exports.fetchAccountTransactions = async (req, res, next) => {
+  /**
      * #swagger.tags = ['Wallet / Account']
      * #swagger.summary = 'Retrieve wallet transactions'
      * #swagger.description = 'Use this endpoint to get a list of all wallet / account transactions'
@@ -142,40 +129,34 @@ exports.fetchAccountTransactions = async(req, res, next) => {
         schema: {$ref:'#/components/schemas/transactions-object'}
     }  
      */
-    try {  
+  try {
+    const { addr } = req.query;
 
-        const {
-            addr
-        } = req.query
-        
-        if(typeof addr === "undefined")
-        {
-            return res.status(400).json({"ERROR":`Invalid address, ${addr}`})
-        }
-
-        var transactionsData = await transactionUtils.getWalletTransactions(addr)
-
-        return res.send(transactionsData)
-
+    if (typeof addr === "undefined") {
+      return res.status(400).json({ ERROR: `Invalid address, ${addr}` });
     }
-    catch (err) {
-        console.log("err", err);
-        err = errorUtils.errorParser(err)
-        res.status(500).json({"ERROR": err})
-        // return next(err)
-    }
-}
+
+    var transactionsData = await transactionUtils.getWalletTransactions(addr);
+
+    return res.send(transactionsData);
+  } catch (err) {
+    console.log("err", err);
+    err = errorUtils.errorParser(err);
+    res.status(500).json({ ERROR: err });
+    // return next(err)
+  }
+};
 
 /**
  * transaferPoints
- * 
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- * @returns 
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
  */
-exports.transaferPoints = async(req, res, next) => {
-    /**
+exports.transaferPoints = async (req, res, next) => {
+  /**
      * #swagger.tags = ['Fidelis Trust Tokens', 'Fidelis Backer Tokens']
      * #swagger.summary = 'Transfer points'
      * #swagger.description = 'Use this endpoint to transfer tokens between wallet addresses'
@@ -232,57 +213,66 @@ exports.transaferPoints = async(req, res, next) => {
         schema: {$ref:'#/components/schemas/transactions-object'}
     }  
      */
-    try {  
+  try {
+    var {
+      receiver_address,
+      sender_address,
+      sender_sk,
+      receiver_sk,
+      amount,
+      tokenAssetId,
+      note,
+    } = req.body;
 
-        const {
-            receiver_address,
-            sender_address,
-            sender_sk,
-            receiver_sk,
-            amount,
-            tokenAssetId,
-            note
-        } = req.post
-        
-        if(typeof receiver_address === "undefined")
-        {
-            return res.status(400).json({"ERROR":`Invalid address, ${receiver_address}`})
-        }
-
-        if(typeof sender_address === "undefined")
-        {
-            return res.status(400).json({"ERROR":`Invalid address, ${sender_address}`})
-        }
-
-        if(typeof sender_sk === "undefined")
-        {
-            return res.status(400).json({"ERROR":`Invalid sender_sk, ${sender_sk}`})
-        }
-
-        if(typeof receiver_sk === "undefined")
-        {
-            return res.status(400).json({"ERROR":`Invalid receiver_sk, ${receiver_sk}`})
-        }
-
-        if(typeof amount === "undefined")
-        {
-            return res.status(400).json({"ERROR":`Invalid amount, ${amount}`})
-        }
-
-        if(typeof tokenAssetId === "undefined")
-        {
-            return res.status(400).json({"ERROR":`Invalid tokenAssetId, ${tokenAssetId}`})
-        }
-
-        var transactionsData = await transactionUtils.transferTokens(receiver_address, sender_address, sender_sk, receiver_sk, amount, tokenAssetId, note)
-
-        return res.send(transactionsData)
-
+    if (typeof receiver_address === "undefined") {
+      return res
+        .status(400)
+        .json({ ERROR: `Invalid address, ${receiver_address}` });
     }
-    catch (err) {
-        console.log("err", err);
-        err = errorUtils.errorParser(err)
-        res.status(500).json({"ERROR": err})
-        // return next(err)
+
+    if (typeof sender_address === "undefined") {
+      return res
+        .status(400)
+        .json({ ERROR: `Invalid address, ${sender_address}` });
     }
-}
+
+    if (typeof sender_sk === "undefined") {
+      return res.status(400).json({ ERROR: `Invalid sender_sk, ${sender_sk}` });
+    }
+
+    if (typeof receiver_sk === "undefined") {
+      return res
+        .status(400)
+        .json({ ERROR: `Invalid receiver_sk, ${receiver_sk}` });
+    }
+
+    if (typeof amount === "undefined") {
+      return res.status(400).json({ ERROR: `Invalid amount, ${amount}` });
+    }
+
+    if (typeof tokenAssetId === "undefined") {
+      return res
+        .status(400)
+        .json({ ERROR: `Invalid tokenAssetId, ${tokenAssetId}` });
+    }
+
+    sender_sk = new Uint8Array(sender_sk.split(","));
+    receiver_sk = new Uint8Array(receiver_sk.split(","));
+    var transactionsData = await transactionUtils.transferTokens(
+      receiver_address,
+      sender_address,
+      sender_sk,
+      receiver_sk,
+      amount,
+      tokenAssetId,
+      note
+    );
+
+    return res.send(transactionsData);
+  } catch (err) {
+    console.log("err", err);
+    err = errorUtils.errorParser(err);
+    res.status(500).json({ ERROR: err });
+    // return next(err)
+  }
+};
