@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const INVESTOR_TYPE = require("../constants/investorTypes");
 
 const walletUtils = require("./wallet");
+const transactionUtilities = require("./transaction");
 
 dotenv.config({
   path: ".env",
@@ -174,8 +175,9 @@ class FidelisContracts {
      * @param {*} investor_type 
      * @returns 
      */
-    async invest (txn_inputs, investor_type)
+    async invest (txn_inputs, investor_type, contract_id=null)
     {
+        contract_id = contract_id == null ? this.contract_id : contract_id;
         let sender_addr = "";
         let sender_mnemonic = "";
         let sender_acc = null;
@@ -185,7 +187,7 @@ class FidelisContracts {
         };
 
 
-        if(!this.contract_id)
+        if(!contract_id)
         {
             response_obj['message'] = "No contract selected";
             return response_obj;
@@ -228,13 +230,13 @@ class FidelisContracts {
             }
             args.push(new Uint8Array(Buffer.from(encryption_key)));
             let note = new Uint8Array(Buffer.from("Staking"));
-            let rekeyTo = algosdk.getApplicationAddress(this.contract_id);
+            let rekeyTo = algosdk.getApplicationAddress(contract_id);
 
             let params = await algodClient.getTransactionParams().do();
     
             console.log(`Adding ${investor_desc} ...`);
     
-            let  txn = algosdk.makeApplicationNoOpTxn(sender_addr, params, this.contract_id, args, [], [], assets, note, undefined, rekeyTo);
+            let  txn = algosdk.makeApplicationNoOpTxn(sender_addr, params, contract_id, args, [], [], assets, note, undefined, rekeyTo);
 
             let txId = txn.txID().toString();
     
@@ -253,10 +255,10 @@ class FidelisContracts {
             // print the app-id
             let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
             let appId = transactionResponse['application-index'];
-            console.log(`Added ${investor_desc} for app-id: `, this.contract_id);
+            console.log(`Added ${investor_desc} for app-id: `, contract_id);
     
             response_obj['success'] = true;
-            response_obj['contract_id'] = this.contract_id;
+            response_obj['contract_id'] = contract_id;
             response_obj['description'] = `Successfully added ${investor_desc}`;
     
             } 
@@ -286,6 +288,7 @@ class FidelisContracts {
 
 
   async optIn(txn_inputs) {
+    this.contract_id = 102416008; //needs change
     let response_obj = {
       success: false,
     };
@@ -349,6 +352,67 @@ class FidelisContracts {
     return response_obj;
   }
 
+  async escrowOptIn()
+  {
+    let contract_id = 102416008;
+      let response_obj = {
+        'success': false
+    };
+
+    try {
+
+      let op = "config";
+      let args = [];
+      let assets = [parseInt(process.env.USDCA_TOKEN_RESERVE_ASSETID), parseInt(process.env.TRUST_TOKEN_RESERVE_ASSETID), parseInt(process.env.BACKER_TOKEN_RESERVE_ASSETID)];
+      args.push(new Uint8Array(Buffer.from(op)));
+
+      
+      let params = await algodClient.getTransactionParams().do();
+    
+      console.log(`opting in ...`);
+
+      let  txn = algosdk.makeApplicationNoOpTxn(sender, params, contract_id, args, [], [], assets);
+
+      let txId = txn.txID().toString();
+
+      let sk = new Uint8Array(process.env.TOKEN_RESERVE_SK.split(","));
+      let signedTxn = txn.signTxn(sk);
+      console.log("Signed transaction with txID: %s", txId);
+
+      // Submit the transaction
+      await algodClient.sendRawTransaction(signedTxn).do();
+
+      // Wait for confirmation
+      await algosdk.waitForConfirmation(algodClient, txId, 2);
+
+      // print the app-id
+      let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
+      let appId = transactionResponse['application-index'];
+      //console.log(transactionResponse);
+      response_obj['success'] = true;
+      response_obj['contract_id'] = appId;
+      response_obj['description'] = 'Successfully opten in';
+
+
+
+      
+      
+    } catch (err) {
+      // If network request, display verbose error
+      if (err.response) {
+        response_obj["message"] = err.response.text;
+        response_obj["status"] = err.response.status;
+        response_obj["description"] = "Network request unsuccessful";
+      } else {
+        //TODO: Handle errors unrelated to network
+        response_obj["description"] = `Could not opt in`;
+        console.log(err);
+      }
+    }
+
+    return response_obj;
+  }
+
     async deploy (txn_inputs) {
  
         let response_obj = {
@@ -357,7 +421,7 @@ class FidelisContracts {
         try {
             const localInts = 2
             const localBytes = 1
-            const globalInts = 3
+            const globalInts = 7
             const globalBytes = 12
     
             let op = "apply";
@@ -365,21 +429,20 @@ class FidelisContracts {
             let end_date = txn_inputs.end_date;
             let loan_amount = txn_inputs.loan_amount;
             let interest = txn_inputs.interest_rate;
+            let balance = "55";
 
             let args = [];
-            let assets = [parseInt(process.env.USDCA_TOKEN_RESERVE_ASSETID)];
+            let assets = [parseInt(process.env.USDCA_TOKEN_RESERVE_ASSETID), parseInt(process.env.TRUST_TOKEN_RESERVE_ASSETID), parseInt(process.env.BACKER_TOKEN_RESERVE_ASSETID)];
             
             args.push(new Uint8Array(Buffer.from(op)));
-            args.push(new Uint8Array(Buffer.from(loan_amount)));
+            args.push("50");
             args.push(new Uint8Array(Buffer.from(interest)));
             args.push(new Uint8Array(Buffer.from(start_date)));
             args.push(new Uint8Array(Buffer.from(end_date)));
-            args.push(new Uint8Array(Buffer.from(algosdk.encodeAddress(reserve_address))));
-            args.push(new Uint8Array(Buffer.from(algosdk.encodeAddress(pool_address))));
-            args.push(new Uint8Array(Buffer.from(algosdk.encodeAddress(txn_inputs.receiver_address))));
-            args.push(new Uint8Array(Buffer.from(algosdk.encodeAddress(txn_inputs.agent_address))));
+            args.push(new Uint8Array(Buffer.from(balance)));
+
             
-            let accounts = [reserve_address, pool_address, txn_inputs.receiver_address, txn_inputs.agent_address];
+            let accounts = [pool_address, txn_inputs.receiver_address, txn_inputs.agent_address];
     
             //let approvalProgramfile = await open(process.env.APPROVAL_TEAL_SOURCE);
             //let clearProgramfile = await open(process.env.CLEAR_TEAL_SOURCE);
@@ -420,6 +483,14 @@ class FidelisContracts {
             response_obj['success'] = true;
             response_obj['contract_id'] = appId;
             response_obj['description'] = 'Successfully deployed contract';
+            console.log(algosdk.getApplicationAddress(appId));
+
+            //fund the escrow
+            let seed_response = await transactionUtilities.seedAccWithAlgos(
+              algosdk.getApplicationAddress(appId)
+            );
+
+             console.log(seed_response);
     
             } catch (err) {
                 // If network request, display verbose error
@@ -452,7 +523,7 @@ let params = {
     "interest_rate": "1",
     "agent_address": "IQDPRKBXGWTC3UQ25JJOBQVGKQSV3B55XR4YSZV6TPYE5V3XI3S7ZRECHM",
     "agent_mnemonic": "hurdle crash pair soul issue estate solution economy hospital frog cinnamon enemy reveal like remain interest off token fiber century corn discover predict absent drink",
-    "start_date": "1234345",
+    "start_date": "12343450",
     "end_date": "16589944",
     "backers": [
         {
@@ -473,9 +544,39 @@ let params = {
 
 let fidelisContracts = new FidelisContracts();
 
-fidelisContracts.initiationFlow(params).then((data) => {
-  console.log(data);
-});
+
+// fidelisContracts.deploy(params).then((data) => {
+//   console.log(data);
+// });
+
+// fidelisContracts.escrowOptIn().then((data) => {
+//   console.log(data);
+// });
+
+
+// fidelisContracts.optIn(
+//   {
+//     address: "ZBHW3NPKQP45BVK2JHBVIIWLC2JD4BULREVCIUHAMQOEZF4BNPQDWHZPDA",
+//     mnemonic: "soda legend agent reject argue artefact genius palace ranch initial spin street tornado exit table review recipe kit comfort artefact metal elephant moment absorb milk",
+//   }
+// ).then((data) => {
+//   console.log(data);
+// });
+
+// fidelisContracts.invest(
+//   {
+//     receiver_address: "ZBHW3NPKQP45BVK2JHBVIIWLC2JD4BULREVCIUHAMQOEZF4BNPQDWHZPDA",
+//     receiver_mnemonic: "soda legend agent reject argue artefact genius palace ranch initial spin street tornado exit table review recipe kit comfort artefact metal elephant moment absorb milk",
+//     receiver_staked_points: "1"
+//   }, INVESTOR_TYPE.BENEFICIARY, 102416008
+// ).then((data) => {
+//   console.log(data);
+// });
+
+let args = [];
+args.push(new Uint8Array(Buffer.from("16589944")));
+
+ console.log(args);
 
 
 
