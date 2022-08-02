@@ -142,6 +142,38 @@ app_global_put
 byte "staked_amount"
 int 0
 app_global_put
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 1
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 2
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
 int 1
 return
 sub0: // invest
@@ -170,11 +202,6 @@ asset_holding_get AssetBalance
 store 0
 store 1
 load 0
-assert
-load 1
-txna ApplicationArgs 1
-btoi
-<=
 assert
 itxn_begin
 int axfer
