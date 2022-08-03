@@ -154,6 +154,7 @@ class FidelisContracts {
     let investor_desc = "";
     let response_obj = {
       success: false,
+      contract_id: this.contract_id
     };
 
     if (!contract_id) {
@@ -274,6 +275,7 @@ class FidelisContracts {
 
     try
     {
+      const enc = new TextEncoder();
       let params = await algodClient.getTransactionParams().do();
       let sk = algosdk.mnemonicToSecretKey(account_params.mnemonic).sk;
 
@@ -290,11 +292,11 @@ class FidelisContracts {
         revocationTarget,
         optin_amount,
         enc.encode("optin txn"),
-        asset_id,
+        parseInt(asset_id),
         params
       );
   
-      rawSignedTxn = opttxn.signTxn(sk);
+      let rawSignedTxn = opttxn.signTxn(sk);
       let ctx = await algodClient.sendRawTransaction(rawSignedTxn).do();
   
       let confirmedTxn = await algosdk.waitForConfirmation(
@@ -322,6 +324,8 @@ class FidelisContracts {
       }
     }
 
+    return response_obj;
+
   }
 
   /**
@@ -335,6 +339,7 @@ class FidelisContracts {
     this.contract_id = !contract_id ? this.contract_id : contract_id;
     let response_obj = {
       success: false,
+      contract_id: this.contract_id
     };
     let sender_addr = txn_inputs.address;
     let sender_mnemonic = txn_inputs.mnemonic;
@@ -451,12 +456,14 @@ class FidelisContracts {
       if (err.response) {
         response_obj["message"] = err.response.text;
         response_obj["status"] = err.response.status;
+        response_obj["contract_id"] = contract_id;
         response_obj["description"] = "Network request unsuccessful";
       } else {
         //TODO: Handle errors unrelated to network
         response_obj[
           "description"
         ] = `Could not opt in the fidelis tokens to escow, please check the logs`;
+        response_obj["contract_id"] = contract_id;
         console.log(err);
       }
     }
@@ -597,9 +604,9 @@ class FidelisContracts {
 
 let params = {
   receiver_address:
-    "ZBHW3NPKQP45BVK2JHBVIIWLC2JD4BULREVCIUHAMQOEZF4BNPQDWHZPDA",
+    "BFQKRVRDXPIBBFTOPX72VZ4PD3M6WKYVVABDVUFSFHTUUVHVL6NABMZN5E",
   receiver_mnemonic:
-    "soda legend agent reject argue artefact genius palace ranch initial spin street tornado exit table review recipe kit comfort artefact metal elephant moment absorb milk",
+    "grunt chronic brown elevator crawl wish attract recycle minimum length nation supply reveal today project begin fluid replace razor team frost fit resemble absent burst",
   receiver_staked_points: "1",
   loan_amount: "50",
   interest_rate: "1",
@@ -610,43 +617,54 @@ let params = {
   end_date: "16589944",
   backers: [
     {
-      points: "2.5",
-      address: "V6PZQZ3DPRALNRK6EPPNFRK2NF5DI3VNZBX4C5VEQDCYORSJTK2PYHWQVQ",
+      points: "2",
+      address: "RS5HA4EIPZIHO7LTHMDBNAEN5JVNDDUDOIHNMVCMWBSOUEOBDKCYYQYL4I",
       mnemonic:
-        "lift insane audit subject liar celery wreck mixed crater peace chief forum injury student beyond seven virtual remove outside strong asset shallow supply absent shock",
+        "nice roof canal fork ethics blouse sign awake income board monitor year sudden dinner ball keep crush steel metal jelly kitchen demand good above face",
       earned: "2.5",
     },
 
     {
-      points: "2.5",
-      address: "6MYSPXEKKMAW4SMTCNXPF3QDTWQBY2Z4YTFXUUYWSLR2EOJHV66XNXLY5E",
+      points: "2",
+      address: "IMWQQJWUIA7S25DNJFYKWMMMMR57QFFGYIIYOPGHY4ABUKEGQFEQCFLJZU",
       mnemonic:
-        "arrest hedgehog toilet expose beef powder vast just cost pink coffee round evolve decade shell glare hunt cousin stay pioneer execute close drive able denial",
+        "depth vendor spatial black omit kick noodle novel swallow noodle warrior rocket sort comic business praise dog spirit route reject blossom danger illegal abstract idle",
       earned: "2.5",
     },
   ],
 };
 
-let fidelisContracts = new FidelisContracts();
+module.exports = FidelisContracts;
 
-// fidelisContracts.initiationFlow(params, 102566748).then((data) => {
+// let fidelisContracts = new FidelisContracts();
+
+// fidelisContracts.initiationFlow(params).then((data) => {
 //   console.log(data);
 // });
 
-fidelisContracts.deploy(params).then((data) => {
-  console.log(data);
-});
-
-// fidelisContracts.escrowOptIn(102710841).then((data) => {
+// fidelisContracts.deploy(params).then((data) => {
 //   console.log(data);
 // });
 
+// fidelisContracts.escrowOptIn(102783585).then((data) => {
+//   console.log(data);
+// });
+
+// fidelisContracts.optIntoAsset({
+//   address:params.agent_address,
+//   mnemonic: params.agent_mnemonic
+// }, process.env.USDCA_TOKEN_RESERVE_ASSETID).then((data) => {
+//   console.log(data);
+// });
+
+
+//beneficiary opt in
 // fidelisContracts
 //   .optIn({
 //     address: "BFQKRVRDXPIBBFTOPX72VZ4PD3M6WKYVVABDVUFSFHTUUVHVL6NABMZN5E",
 //     mnemonic:
 //       "grunt chronic brown elevator crawl wish attract recycle minimum length nation supply reveal today project begin fluid replace razor team frost fit resemble absent burst",
-//   })
+//   }, 102783585)
 //   .then((data) => {
 //     console.log(data);
 //   });
