@@ -498,6 +498,7 @@ class FidelisContracts {
       args.push(new Uint8Array(Buffer.from(interest)));
       args.push(new Uint8Array(Buffer.from(start_date)));
       args.push(new Uint8Array(Buffer.from(end_date)));
+      args.push(new Uint8Array(Buffer.from(balance)));
 
       let accounts = [
         pool_address,
@@ -632,9 +633,9 @@ let fidelisContracts = new FidelisContracts();
 //   console.log(data);
 // });
 
-// fidelisContracts.deploy(params).then((data) => {
-//   console.log(data);
-// });
+fidelisContracts.deploy(params).then((data) => {
+  console.log(data);
+});
 
 // fidelisContracts.escrowOptIn(102710841).then((data) => {
 //   console.log(data);
