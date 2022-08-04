@@ -136,7 +136,9 @@ class FidelisContracts {
       );
       console.log(backer_response);
     }
-
+    response_obj['success']  =true;
+    response_obj['contract_id'] = this.contract_id;
+    response_obj['description'] = "Successfully applied for loan";
     return response_obj;
   }
 

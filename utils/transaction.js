@@ -24,7 +24,7 @@ exports.transferTokens = async (
   sender_address,
   sender_sk,
   receiver_sk,
-  amount = 25,
+  amount = 2500,
   tokenAssetId,
   note = "Fidelis tokens transfer"
 ) => {
