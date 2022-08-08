@@ -123,6 +123,7 @@ def approval():
                 )
             )
 
+
     @Subroutine(TealType.none)
     def reclaim():
         # allow backers  to relcaim  staked points,
@@ -209,7 +210,7 @@ def approval():
                 InnerTxnBuilder.SetFields(
                     {
                         TxnField.type_enum: TxnType.AssetTransfer,
-                        TxnField.asset_receiver: App.globalGet(pool_address),
+                        TxnField.asset_receiver: Global.current_application_address(),
                         TxnField.asset_amount: Btoi(Txn.application_args[1]), #amount
                         TxnField.xfer_asset: Txn.assets[0],
                         TxnField.sender: Txn.sender(), #agent address
@@ -221,7 +222,19 @@ def approval():
                 If(App.globalGet(balance) == Int(0))
                 .Then(
                     Seq(
-                        App.globalPut(loan_state, Bytes('matured'))
+                        App.globalPut(loan_state, Bytes('matured')),
+                        InnerTxnBuilder.Begin(),
+                        InnerTxnBuilder.SetFields(
+                            {
+                                TxnField.type_enum: TxnType.AssetTransfer,
+                                TxnField.asset_receiver: App.globalGet(Bytes("pool_address")),
+                                TxnField.asset_amount: App.globalGet(loan_amount)+ App.globalGet(fee), #amount
+                                TxnField.xfer_asset: Txn.assets[0],
+                                TxnField.sender: Txn.sender(), #agent address
+                                TxnField.rekey_to: Txn.sender()
+                            }
+                        ),
+                        InnerTxnBuilder.Submit(),  
                     )
                 )
             )

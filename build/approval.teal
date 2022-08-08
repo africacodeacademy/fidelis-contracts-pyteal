@@ -1,4 +1,4 @@
-#pragma version 7
+#pragma version 6
 txn ApplicationID
 int 0
 ==
@@ -363,8 +363,7 @@ assert
 itxn_begin
 int axfer
 itxn_field TypeEnum
-byte "pool_address"
-app_global_get
+global CurrentApplicationAddress
 itxn_field AssetReceiver
 txna ApplicationArgs 1
 btoi
@@ -391,5 +390,24 @@ bz repay_3_l2
 byte "loan_state"
 byte "matured"
 app_global_put
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "pool_address"
+app_global_get
+itxn_field AssetReceiver
+byte "loan_amount"
+app_global_get
+byte "fee"
+app_global_get
++
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+txn Sender
+itxn_field Sender
+txn Sender
+itxn_field RekeyTo
+itxn_submit
 repay_3_l2:
 retsub
