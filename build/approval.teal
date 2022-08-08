@@ -1,4 +1,4 @@
-#pragma version 5
+#pragma version 7
 txn ApplicationID
 int 0
 ==
@@ -60,16 +60,16 @@ main_l16:
 int 1
 return
 main_l17:
-callsub sub2
+callsub escrowconfig_2
 b main_l15
 main_l18:
-callsub sub0
+callsub invest_0
 b main_l15
 main_l19:
-callsub sub1
+callsub reclaim_1
 b main_l15
 main_l20:
-callsub sub3
+callsub repay_3
 b main_l15
 main_l21:
 int 0
@@ -101,14 +101,17 @@ btoi
 >
 assert
 byte "balance"
-txna ApplicationArgs 5
+txna ApplicationArgs 1
 btoi
+txna ApplicationArgs 2
+btoi
++
 app_global_put
 byte "loan_amount"
 txna ApplicationArgs 1
 btoi
 app_global_put
-byte "interest_rate"
+byte "fee"
 txna ApplicationArgs 2
 btoi
 app_global_put
@@ -143,7 +146,9 @@ txn Sender
 app_global_put
 int 1
 return
-sub0: // invest
+
+// invest
+invest_0:
 byte "loan_state"
 app_global_get
 byte "openToInvestment"
@@ -166,9 +171,9 @@ assert
 txn Sender
 txna Assets 0
 asset_holding_get AssetBalance
-store 0
 store 1
-load 0
+store 0
+load 1
 assert
 itxn_begin
 int axfer
@@ -182,6 +187,8 @@ txna Assets 0
 itxn_field XferAsset
 txn Sender
 itxn_field Sender
+txn Sender
+itxn_field RekeyTo
 itxn_submit
 txn Sender
 txn ApplicationID
@@ -217,7 +224,7 @@ app_global_get
 byte "loan_amount"
 app_global_get
 >=
-bz sub0_l2
+bz invest_0_l2
 byte "loan_state"
 byte "alive"
 app_global_put
@@ -237,9 +244,11 @@ byte "pool_address"
 app_global_get
 itxn_field Sender
 itxn_submit
-sub0_l2:
+invest_0_l2:
 retsub
-sub1: // reclaim
+
+// reclaim
+reclaim_1:
 byte "loan_state"
 app_global_get
 byte "matured"
@@ -285,7 +294,9 @@ int 0
 app_local_put
 int 1
 return
-sub2: // escrow_config
+
+// escrow_config
+escrowconfig_2:
 byte "manager"
 app_global_get
 txn Sender
@@ -328,7 +339,9 @@ global CurrentApplicationAddress
 itxn_field Sender
 itxn_submit
 retsub
-sub3: // repay
+
+// repay
+repay_3:
 txna ApplicationArgs 1
 btoi
 int 0
@@ -343,14 +356,9 @@ assert
 txn Sender
 txna Assets 0
 asset_holding_get AssetBalance
-store 2
 store 3
-load 2
-assert
+store 2
 load 3
-txna ApplicationArgs 1
-btoi
->=
 assert
 itxn_begin
 int axfer
@@ -365,6 +373,8 @@ txna Assets 0
 itxn_field XferAsset
 txn Sender
 itxn_field Sender
+txn Sender
+itxn_field RekeyTo
 itxn_submit
 byte "balance"
 byte "balance"
@@ -377,9 +387,9 @@ byte "balance"
 app_global_get
 int 0
 ==
-bz sub3_l2
+bz repay_3_l2
 byte "loan_state"
 byte "matured"
 app_global_put
-sub3_l2:
+repay_3_l2:
 retsub
