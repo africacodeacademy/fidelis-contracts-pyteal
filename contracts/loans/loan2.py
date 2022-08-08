@@ -230,8 +230,7 @@ def approval():
                                 TxnField.asset_receiver: App.globalGet(Bytes("pool_address")),
                                 TxnField.asset_amount: App.globalGet(loan_amount)+ App.globalGet(fee), #amount
                                 TxnField.xfer_asset: Txn.assets[0],
-                                TxnField.sender: Txn.sender(), #agent address
-                                TxnField.rekey_to: Txn.sender()
+                                TxnField.sender: Global.current_application_address(), 
                             }
                         ),
                         InnerTxnBuilder.Submit(),  

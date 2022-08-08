@@ -404,10 +404,8 @@ app_global_get
 itxn_field AssetAmount
 txna Assets 0
 itxn_field XferAsset
-txn Sender
+global CurrentApplicationAddress
 itxn_field Sender
-txn Sender
-itxn_field RekeyTo
 itxn_submit
 repay_3_l2:
 retsub
