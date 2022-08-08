@@ -212,7 +212,8 @@ def approval():
                         TxnField.asset_receiver: App.globalGet(pool_address),
                         TxnField.asset_amount: Btoi(Txn.application_args[1]), #amount
                         TxnField.xfer_asset: Txn.assets[0],
-                        TxnField.sender: Txn.sender() #agent address
+                        TxnField.sender: Txn.sender(), #agent address
+                        TxnField.rekey_to: Txn.sender()
                     }
                 ),
                 InnerTxnBuilder.Submit(),   
