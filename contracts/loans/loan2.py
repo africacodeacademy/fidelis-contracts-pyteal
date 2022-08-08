@@ -8,7 +8,7 @@ def approval():
     balance = Bytes("balance")
     start_date = Bytes("start_date")
     end_date = Bytes("end_date")
-    interest_rate = Bytes("interest_rate")
+    fee = Bytes("fee")
     loan_amount = Bytes("loan_amount")
     staked_amount = Bytes("staked_amount")
     beneficiary_address = Bytes("beneficiary")
@@ -51,11 +51,11 @@ def approval():
         #   
     handle_creation = Seq(
         Assert(Btoi(Txn.application_args[1]) > Int(0)), #check valid loan amount
-        Assert(Btoi(Txn.application_args[2]) > Int(0)), #check valid interest rate
+        Assert(Btoi(Txn.application_args[2]) > Int(0)), #check valid fee
         Assert(Btoi(Txn.application_args[4]) > Btoi(Txn.application_args[3])), #check valid dates
-        App.globalPut(balance,  Btoi(Txn.application_args[5])),
+        App.globalPut(balance,  Btoi(Txn.application_args[1])+Btoi(Txn.application_args[2])),
         App.globalPut(loan_amount, Btoi(Txn.application_args[1])),
-        App.globalPut(interest_rate, Btoi(Txn.application_args[2])),
+        App.globalPut(fee, Btoi(Txn.application_args[2])),
         App.globalPut(start_date, Btoi(Txn.application_args[3])),
         App.globalPut(end_date, Btoi(Txn.application_args[4])),
         App.globalPut(pool_address, Txn.accounts[1]),
@@ -93,7 +93,8 @@ def approval():
                        TxnField.asset_receiver: Global.current_application_address(),
                        TxnField.asset_amount: Btoi(Txn.application_args[1]),
                        TxnField.xfer_asset: Txn.assets[0],
-                       TxnField.sender: Txn.sender() 
+                       TxnField.sender: Txn.sender(),
+                       TxnField.rekey_to: Txn.sender()
                    }
                 ),
                 InnerTxnBuilder.Submit(),
@@ -102,6 +103,7 @@ def approval():
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount')),  Btoi(Txn.application_args[1])),
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_asset')),  Txn.assets[0]),
                 App.globalPut(staked_amount, App.globalGet(staked_amount) + Btoi(Txn.application_args[1])),
+                
                 If(App.globalGet(staked_amount) >= App.globalGet(loan_amount))
                 .Then(
                     Seq(
