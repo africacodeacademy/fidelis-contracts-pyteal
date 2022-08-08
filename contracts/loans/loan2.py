@@ -203,7 +203,7 @@ def approval():
                 Assert(App.globalGet(balance) >= Btoi(Txn.application_args[1])),
                 agentAssetBalance,
                 Assert(agentAssetBalance.hasValue()),
-                Assert(agentAssetBalance.value() >= Btoi(Txn.application_args[1])),
+                # Assert(agentAssetBalance.value() >= Btoi(Txn.application_args[1])),
 
                 InnerTxnBuilder.Begin(),
                 InnerTxnBuilder.SetFields(
