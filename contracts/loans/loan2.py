@@ -227,7 +227,7 @@ def approval():
                         InnerTxnBuilder.SetFields(
                             {
                                 TxnField.type_enum: TxnType.AssetTransfer,
-                                TxnField.asset_receiver: App.globalGet(Bytes("pool_address")),
+                                TxnField.asset_receiver: Txn.accounts[1],
                                 TxnField.asset_amount: App.globalGet(loan_amount)+ App.globalGet(fee), #amount
                                 TxnField.xfer_asset: Txn.assets[0],
                                 TxnField.sender: Global.current_application_address(), 

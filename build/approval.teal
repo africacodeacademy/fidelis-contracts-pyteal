@@ -393,8 +393,7 @@ app_global_put
 itxn_begin
 int axfer
 itxn_field TypeEnum
-byte "pool_address"
-app_global_get
+txna Accounts 1
 itxn_field AssetReceiver
 byte "loan_amount"
 app_global_get
