@@ -2,23 +2,23 @@
 txn ApplicationID
 int 0
 ==
-bnz main_l27
+bnz main_l25
 txn OnCompletion
 int DeleteApplication
 ==
-bnz main_l26
+bnz main_l24
 txn OnCompletion
 int UpdateApplication
 ==
-bnz main_l25
+bnz main_l23
 txn OnCompletion
 int OptIn
 ==
-bnz main_l24
+bnz main_l22
 txn OnCompletion
 int CloseOut
 ==
-bnz main_l23
+bnz main_l21
 txn OnCompletion
 int NoOp
 ==
@@ -28,32 +28,31 @@ main_l7:
 txna ApplicationArgs 0
 byte "payment"
 ==
-bnz main_l22
+bnz main_l20
 txna ApplicationArgs 0
 byte "reclaim"
 ==
-bnz main_l21
+bnz main_l19
 txna ApplicationArgs 0
 byte "invest"
 ==
-bnz main_l20
+bnz main_l18
 txna ApplicationArgs 0
 byte "config"
 ==
-bnz main_l19
-txna ApplicationArgs 0
-byte "pull"
-==
-bnz main_l18
+bnz main_l17
 txna ApplicationArgs 0
 byte "force_close"
 ==
-bnz main_l17
+bnz main_l16
 txna ApplicationArgs 0
 byte "check_default"
 ==
-bnz main_l15
+bnz main_l14
 err
+main_l14:
+int 1
+return
 main_l15:
 int 1
 return
@@ -61,36 +60,30 @@ main_l16:
 int 1
 return
 main_l17:
+callsub escrowconfig_2
+b main_l15
+main_l18:
+callsub invest_0
+b main_l15
+main_l19:
+callsub reclaim_1
+b main_l15
+main_l20:
+callsub repay_3
+b main_l15
+main_l21:
+int 0
+return
+main_l22:
 int 1
 return
-main_l18:
-callsub pull_4
-b main_l16
-main_l19:
-callsub escrowconfig_2
-b main_l16
-main_l20:
-callsub invest_0
-b main_l16
-main_l21:
-callsub reclaim_1
-b main_l16
-main_l22:
-callsub repay_3
-b main_l16
 main_l23:
 int 0
 return
 main_l24:
-int 1
+int 0
 return
 main_l25:
-int 0
-return
-main_l26:
-int 0
-return
-main_l27:
 txna ApplicationArgs 1
 btoi
 int 0
@@ -228,8 +221,6 @@ btoi
 app_global_put
 byte "staked_amount"
 app_global_get
-int 10000
-*
 byte "loan_amount"
 app_global_get
 >=
@@ -237,6 +228,22 @@ bz invest_0_l2
 byte "loan_state"
 byte "alive"
 app_global_put
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "agent_address"
+app_global_get
+itxn_field AssetReceiver
+byte "loan_amount"
+app_global_get
+itxn_field AssetAmount
+byte "stable_token"
+app_global_get
+itxn_field XferAsset
+byte "pool_address"
+app_global_get
+itxn_field Sender
+itxn_submit
 invest_0_l2:
 retsub
 
@@ -268,12 +275,7 @@ byte "_amount"
 concat
 app_local_get
 itxn_field AssetAmount
-txn Sender
-txn ApplicationID
-itob
-byte "_asset"
-concat
-app_local_get
+txna Assets 0
 itxn_field XferAsset
 global CurrentApplicationAddress
 itxn_field Sender
@@ -386,8 +388,7 @@ app_global_put
 itxn_begin
 int axfer
 itxn_field TypeEnum
-byte "pool_address"
-app_global_get
+txna Accounts 1
 itxn_field AssetReceiver
 byte "loan_amount"
 app_global_get
@@ -401,42 +402,4 @@ global CurrentApplicationAddress
 itxn_field Sender
 itxn_submit
 repay_3_l2:
-retsub
-
-// pull
-pull_4:
-txn Sender
-byte "agent_address"
-app_global_get
-==
-assert
-itxn_begin
-int axfer
-itxn_field TypeEnum
-byte "agent_address"
-app_global_get
-itxn_field AssetReceiver
-byte "loan_amount"
-app_global_get
-itxn_field AssetAmount
-txna Assets 0
-itxn_field XferAsset
-global CurrentApplicationAddress
-itxn_field Sender
-itxn_submit
-txn Sender
-txn ApplicationID
-itob
-byte "_amount"
-concat
-byte "loan_amount"
-app_global_get
-app_local_put
-txn Sender
-txn ApplicationID
-itob
-byte "_asset"
-concat
-txna Assets 0
-app_local_put
 retsub

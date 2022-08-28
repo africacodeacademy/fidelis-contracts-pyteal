@@ -51,7 +51,7 @@ def check_self(
 
 
 def application(pyteal: Expr) -> str:
-    return compileTeal(pyteal, mode=Mode.Application, version=MAX_TEAL_VERSION)
+    return compileTeal(pyteal, mode=Mode.Application, version=6)
 
 
 @dataclass
@@ -62,7 +62,7 @@ class CompiledSignature:
 
 
 def signature(algod_client: AlgodClient, pyteal: Expr) -> CompiledSignature:
-    teal = compileTeal(pyteal, mode=Mode.Signature, version=MAX_TEAL_VERSION)
+    teal = compileTeal(pyteal, mode=Mode.Signature, version=6)
     compilation_result = algod_client.compile(teal)
     return CompiledSignature(
         address=compilation_result["hash"],

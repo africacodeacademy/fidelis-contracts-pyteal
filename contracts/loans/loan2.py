@@ -143,7 +143,7 @@ def approval():
                         TxnField.type_enum: TxnType.AssetTransfer,
                         TxnField.asset_receiver: Txn.sender(),
                         TxnField.asset_amount: App.localGet(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount'))), #amount
-                        TxnField.xfer_asset: App.localGet(Txn.sender(), Concat(Itob(Txn.application_id()),Bytes('_asset'))),
+                        TxnField.xfer_asset: Txn.assets[0], # todo : revert
                         TxnField.sender: Global.current_application_address()
                     }
                 ),
