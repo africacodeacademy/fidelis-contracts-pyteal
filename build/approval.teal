@@ -241,8 +241,7 @@ app_global_get
 itxn_field AssetAmount
 txna Assets 1
 itxn_field XferAsset
-byte "pool_address"
-app_global_get
+global CurrentApplicationAddress
 itxn_field Sender
 itxn_submit
 invest_0_l2:
