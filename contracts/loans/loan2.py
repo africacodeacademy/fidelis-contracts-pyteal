@@ -114,7 +114,7 @@ def approval():
                                 TxnField.type_enum: TxnType.AssetTransfer,
                                 TxnField.asset_receiver: App.globalGet(agent_address),
                                 TxnField.asset_amount: App.globalGet(loan_amount),
-                                TxnField.xfer_asset: App.globalGet(stable_token),
+                                TxnField.xfer_asset: Txn.assets[1],
                                 TxnField.sender: App.globalGet(pool_address),
                             }
                         ),

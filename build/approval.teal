@@ -239,8 +239,7 @@ itxn_field AssetReceiver
 byte "loan_amount"
 app_global_get
 itxn_field AssetAmount
-byte "stable_token"
-app_global_get
+txna Assets 1
 itxn_field XferAsset
 byte "pool_address"
 app_global_get
