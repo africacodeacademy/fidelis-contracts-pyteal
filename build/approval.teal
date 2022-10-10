@@ -1,4 +1,4 @@
-#pragma version 6
+#pragma version 7
 txn ApplicationID
 int 0
 ==
@@ -221,6 +221,8 @@ btoi
 app_global_put
 byte "staked_amount"
 app_global_get
+int 10000
+*
 byte "loan_amount"
 app_global_get
 >=

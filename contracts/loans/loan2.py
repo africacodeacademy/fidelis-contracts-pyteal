@@ -104,7 +104,7 @@ def approval():
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_asset')),  Txn.assets[0]),
                 App.globalPut(staked_amount, App.globalGet(staked_amount) + Btoi(Txn.application_args[1])),
                 
-                If(App.globalGet(staked_amount) >= App.globalGet(loan_amount))
+                If(App.globalGet(staked_amount) * Int(10000) >= App.globalGet(loan_amount))
                 .Then(
                     Seq(
                         App.globalPut(loan_state, Bytes('alive')),
