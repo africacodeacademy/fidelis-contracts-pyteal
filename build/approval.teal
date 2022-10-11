@@ -1,0 +1,405 @@
+#pragma version 7
+txn ApplicationID
+int 0
+==
+bnz main_l25
+txn OnCompletion
+int DeleteApplication
+==
+bnz main_l24
+txn OnCompletion
+int UpdateApplication
+==
+bnz main_l23
+txn OnCompletion
+int OptIn
+==
+bnz main_l22
+txn OnCompletion
+int CloseOut
+==
+bnz main_l21
+txn OnCompletion
+int NoOp
+==
+bnz main_l7
+err
+main_l7:
+txna ApplicationArgs 0
+byte "payment"
+==
+bnz main_l20
+txna ApplicationArgs 0
+byte "reclaim"
+==
+bnz main_l19
+txna ApplicationArgs 0
+byte "invest"
+==
+bnz main_l18
+txna ApplicationArgs 0
+byte "config"
+==
+bnz main_l17
+txna ApplicationArgs 0
+byte "force_close"
+==
+bnz main_l16
+txna ApplicationArgs 0
+byte "check_default"
+==
+bnz main_l14
+err
+main_l14:
+int 1
+return
+main_l15:
+int 1
+return
+main_l16:
+int 1
+return
+main_l17:
+callsub escrowconfig_2
+b main_l15
+main_l18:
+callsub invest_0
+b main_l15
+main_l19:
+callsub reclaim_1
+b main_l15
+main_l20:
+callsub repay_3
+b main_l15
+main_l21:
+int 0
+return
+main_l22:
+int 1
+return
+main_l23:
+int 0
+return
+main_l24:
+int 0
+return
+main_l25:
+txna ApplicationArgs 1
+btoi
+int 0
+>
+assert
+txna ApplicationArgs 2
+btoi
+int 0
+>
+assert
+txna ApplicationArgs 4
+btoi
+txna ApplicationArgs 3
+btoi
+>
+assert
+byte "balance"
+txna ApplicationArgs 1
+btoi
+txna ApplicationArgs 2
+btoi
++
+app_global_put
+byte "loan_amount"
+txna ApplicationArgs 1
+btoi
+app_global_put
+byte "fee"
+txna ApplicationArgs 2
+btoi
+app_global_put
+byte "start_date"
+txna ApplicationArgs 3
+btoi
+app_global_put
+byte "end_date"
+txna ApplicationArgs 4
+btoi
+app_global_put
+byte "pool_address"
+txna Accounts 1
+app_global_put
+byte "beneficiary"
+txna Accounts 2
+app_global_put
+byte "agent_address"
+txna Accounts 3
+app_global_put
+byte "stable_token"
+txna Assets 0
+app_global_put
+byte "loan_state"
+byte "openToInvestment"
+app_global_put
+byte "staked_amount"
+int 0
+app_global_put
+byte "manager"
+txn Sender
+app_global_put
+int 1
+return
+
+// invest
+invest_0:
+byte "loan_state"
+app_global_get
+byte "openToInvestment"
+==
+assert
+txna ApplicationArgs 1
+btoi
+byte "staked_amount"
+app_global_get
++
+byte "loan_amount"
+app_global_get
+<=
+assert
+txna ApplicationArgs 1
+btoi
+int 0
+>
+assert
+txn Sender
+txna Assets 0
+asset_holding_get AssetBalance
+store 1
+store 0
+load 1
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+txna ApplicationArgs 1
+btoi
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+txn Sender
+itxn_field Sender
+txn Sender
+itxn_field RekeyTo
+itxn_submit
+txn Sender
+txn ApplicationID
+itob
+byte "_key"
+concat
+txna ApplicationArgs 2
+app_local_put
+txn Sender
+txn ApplicationID
+itob
+byte "_amount"
+concat
+txna ApplicationArgs 1
+btoi
+app_local_put
+txn Sender
+txn ApplicationID
+itob
+byte "_asset"
+concat
+txna Assets 0
+app_local_put
+byte "staked_amount"
+byte "staked_amount"
+app_global_get
+txna ApplicationArgs 1
+btoi
++
+app_global_put
+byte "staked_amount"
+app_global_get
+int 10000
+*
+byte "loan_amount"
+app_global_get
+>=
+bz invest_0_l2
+byte "loan_state"
+byte "alive"
+app_global_put
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "agent_address"
+app_global_get
+itxn_field AssetReceiver
+byte "loan_amount"
+app_global_get
+itxn_field AssetAmount
+txna Assets 1
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+invest_0_l2:
+retsub
+
+// reclaim
+reclaim_1:
+byte "loan_state"
+app_global_get
+byte "matured"
+==
+assert
+txn Sender
+txn ApplicationID
+itob
+byte "_key"
+concat
+app_local_get
+int 0
+!=
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+txn Sender
+itxn_field AssetReceiver
+txn Sender
+txn ApplicationID
+itob
+byte "_amount"
+concat
+app_local_get
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+txn Sender
+txn ApplicationID
+itob
+byte "_amount"
+concat
+int 0
+app_local_put
+int 1
+return
+
+// escrow_config
+escrowconfig_2:
+byte "manager"
+app_global_get
+txn Sender
+==
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 1
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 2
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+retsub
+
+// repay
+repay_3:
+txna ApplicationArgs 1
+btoi
+int 0
+>
+assert
+byte "balance"
+app_global_get
+txna ApplicationArgs 1
+btoi
+>=
+assert
+txn Sender
+txna Assets 0
+asset_holding_get AssetBalance
+store 3
+store 2
+load 3
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+txna ApplicationArgs 1
+btoi
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+txn Sender
+itxn_field Sender
+txn Sender
+itxn_field RekeyTo
+itxn_submit
+byte "balance"
+byte "balance"
+app_global_get
+txna ApplicationArgs 1
+btoi
+-
+app_global_put
+byte "balance"
+app_global_get
+int 0
+==
+bz repay_3_l2
+byte "loan_state"
+byte "matured"
+app_global_put
+itxn_begin
+int axfer
+itxn_field TypeEnum
+txna Accounts 1
+itxn_field AssetReceiver
+byte "loan_amount"
+app_global_get
+byte "fee"
+app_global_get
++
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+repay_3_l2:
+retsub
