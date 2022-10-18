@@ -134,7 +134,7 @@ def approval():
 
         return Seq(
                 Assert(App.globalGet(Bytes('loan_state')) == Bytes('matured')),
-                Assert(App.localGet(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_key'))) != Int(0)),
+                Assert(App.localGet(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount'))) != Int(0)),
                 # TODO:: Validate encryption key
 
                 InnerTxnBuilder.Begin(),

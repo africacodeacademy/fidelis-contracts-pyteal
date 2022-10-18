@@ -1,4 +1,4 @@
-#pragma version 7
+#pragma version 6
 txn ApplicationID
 int 0
 ==
@@ -239,9 +239,11 @@ itxn_field AssetReceiver
 byte "loan_amount"
 app_global_get
 itxn_field AssetAmount
-txna Assets 1
+byte "stable_token"
+app_global_get
 itxn_field XferAsset
-global CurrentApplicationAddress
+byte "pool_address"
+app_global_get
 itxn_field Sender
 itxn_submit
 invest_0_l2:
@@ -257,7 +259,7 @@ assert
 txn Sender
 txn ApplicationID
 itob
-byte "_key"
+byte "_amount"
 concat
 app_local_get
 int 0
