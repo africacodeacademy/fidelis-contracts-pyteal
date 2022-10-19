@@ -351,7 +351,7 @@ int axfer
 ==
 assert
 int 0
-gtxns AssetSender
+gtxns Sender
 txn Sender
 ==
 assert
