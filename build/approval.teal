@@ -339,17 +339,6 @@ retsub
 
 // repay
 repay_3:
-txna ApplicationArgs 1
-btoi
-int 0
->
-assert
-byte "balance"
-app_global_get
-txna ApplicationArgs 1
-btoi
->=
-assert
 txn Sender
 txna Assets 0
 asset_holding_get AssetBalance
@@ -357,26 +346,43 @@ store 3
 store 2
 load 3
 assert
-itxn_begin
+int 0
+gtxns TypeEnum
 int axfer
-itxn_field TypeEnum
+==
+assert
+int 0
+gtxns AssetSender
+txn Sender
+==
+assert
+int 0
+gtxns AssetReceiver
 global CurrentApplicationAddress
-itxn_field AssetReceiver
-txna ApplicationArgs 1
-btoi
-itxn_field AssetAmount
-txna Assets 0
-itxn_field XferAsset
-txn Sender
-itxn_field Sender
-txn Sender
-itxn_field RekeyTo
-itxn_submit
+==
+assert
+int 0
+gtxns XferAsset
+int 0
+txnas Assets
+==
+assert
+int 0
+gtxns AssetAmount
+byte "balance"
+app_global_get
+<=
+assert
+int 0
+gtxns AssetAmount
+int 0
+>=
+assert
 byte "balance"
 byte "balance"
 app_global_get
-txna ApplicationArgs 1
-btoi
+int 0
+gtxns AssetAmount
 -
 app_global_put
 byte "balance"
