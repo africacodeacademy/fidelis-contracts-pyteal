@@ -362,8 +362,7 @@ global CurrentApplicationAddress
 assert
 int 0
 gtxns XferAsset
-int 0
-txnas Assets
+txna Assets 0
 ==
 assert
 int 0
