@@ -338,6 +338,10 @@ retsub
 
 // repay
 repay_3:
+gtxn 0 TypeEnum
+int axfer
+==
+assert
 byte "balance"
 byte "balance"
 app_global_get
