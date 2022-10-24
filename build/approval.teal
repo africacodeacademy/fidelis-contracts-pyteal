@@ -338,38 +338,6 @@ retsub
 
 // repay
 repay_3:
-txn Sender
-txna Assets 0
-asset_holding_get AssetBalance
-store 3
-store 2
-load 3
-assert
-gtxn 0 TypeEnum
-int axfer
-==
-assert
-gtxn 0 AssetSender
-txn Sender
-==
-assert
-gtxn 0 AssetReceiver
-global CurrentApplicationAddress
-==
-assert
-gtxn 0 XferAsset
-txna Assets 0
-==
-assert
-gtxn 0 AssetAmount
-byte "balance"
-app_global_get
-<=
-assert
-gtxn 0 AssetAmount
-int 0
->=
-assert
 byte "balance"
 byte "balance"
 app_global_get
