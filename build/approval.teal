@@ -345,42 +345,35 @@ store 3
 store 2
 load 3
 assert
-int 0
-gtxns TypeEnum
+gtxn 0 TypeEnum
 int axfer
 ==
 assert
-int 0
-gtxns Sender
+gtxn 0 AssetSender
 txn Sender
 ==
 assert
-int 0
-gtxns AssetReceiver
+gtxn 0 AssetReceiver
 global CurrentApplicationAddress
 ==
 assert
-int 0
-gtxns XferAsset
+gtxn 0 XferAsset
 txna Assets 0
 ==
 assert
-int 0
-gtxns AssetAmount
+gtxn 0 AssetAmount
 byte "balance"
 app_global_get
 <=
 assert
-int 0
-gtxns AssetAmount
+gtxn 0 AssetAmount
 int 0
 >=
 assert
 byte "balance"
 byte "balance"
 app_global_get
-int 0
-gtxns AssetAmount
+gtxn 0 AssetAmount
 -
 app_global_put
 byte "balance"
