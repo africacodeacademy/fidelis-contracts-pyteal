@@ -338,23 +338,8 @@ retsub
 
 // repay
 repay_3:
-txn Sender
-txna Assets 0
-asset_holding_get AssetBalance
-store 3
-store 2
-load 3
-assert
-load 2
-gtxn 0 AssetAmount
->=
-assert
 gtxn 0 TypeEnum
 int axfer
-==
-assert
-gtxn 0 AssetSender
-txn Sender
 ==
 assert
 gtxn 0 AssetReceiver
