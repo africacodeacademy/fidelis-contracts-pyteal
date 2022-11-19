@@ -12,7 +12,6 @@ def approval():
     loan_amount = Bytes("loan_amount")
     staked_amount = Bytes("staked_amount")
     beneficiary_address = Bytes("beneficiary")
-    reserve_address = Bytes("reserve_address")
     pool_address = Bytes("pool_address")
     loan_state = Bytes('loan_state')
     agent_address = Bytes('agent_address')
@@ -52,12 +51,14 @@ def approval():
     handle_creation = Seq(
         Assert(Btoi(Txn.application_args[1]) > Int(0)), #check valid loan amount
         Assert(Btoi(Txn.application_args[2]) > Int(0)), #check valid fee
+        Assert(Global.latest_timestamp() > (Btoi(Txn.application_args[3])*100)),
+        Assert(Global.latest_timestamp() < (Btoi(Txn.application_args[4])*100)),
         Assert(Btoi(Txn.application_args[4]) > Btoi(Txn.application_args[3])), #check valid dates
         App.globalPut(balance,  Btoi(Txn.application_args[1])+Btoi(Txn.application_args[2])),
         App.globalPut(loan_amount, Btoi(Txn.application_args[1])),
         App.globalPut(fee, Btoi(Txn.application_args[2])),
-        App.globalPut(start_date, Btoi(Txn.application_args[3])),
-        App.globalPut(end_date, Btoi(Txn.application_args[4])),
+        App.globalPut(start_date, Btoi(Txn.application_args[3])*100),
+        App.globalPut(end_date, Btoi(Txn.application_args[4])*100),
         App.globalPut(pool_address, Txn.accounts[1]),
         App.globalPut(beneficiary_address, Txn.accounts[2]),
         App.globalPut(agent_address, Txn.accounts[3]),
@@ -76,33 +77,35 @@ def approval():
         # preconditions:
         #       must have enough tokens
         #       proposed stake + total staked tokens must be <= loan amount
-        inverstorAssetBalance = AssetHolding.balance(Txn.sender(), Txn.assets[0])
         return Seq(
                 Assert(App.globalGet(loan_state) == Bytes('openToInvestment')),
-                Assert((Btoi(Txn.application_args[1]) + App.globalGet(staked_amount)) <= App.globalGet(loan_amount)), # The backer ending fails this assertion
-                Assert(Btoi(Txn.application_args[1]) > Int(0)), #check investment amount > 0
-                inverstorAssetBalance,
-                Assert(inverstorAssetBalance.hasValue()),
-                # Assert(inverstorAssetBalance.value() >= Btoi(Txn.application_args[1])),
+                Assert(Global.latest_timestamp() < App.globalGet(end_date)),
+                Assert(Gtxn[0].type_enum() == TxnType.AssetTransfer),
+                # Assert(Gtxn[0].asset_sender() == Txn.sender()),
+                Assert(Gtxn[0].asset_receiver() == Global.current_application_address()),
+                Assert(Gtxn[0].xfer_asset() == Txn.assets[0]),
+                Assert(Gtxn[0].asset_amount() > Int(0)),
+
+                Assert((Gtxn[0].asset_amount() + App.globalGet(staked_amount)) <= App.globalGet(loan_amount)), # The backer ending fails this assertion
                 
-                ## 
-                InnerTxnBuilder.Begin(),
-                InnerTxnBuilder.SetFields(
-                   {
-                       TxnField.type_enum: TxnType.AssetTransfer,
-                       TxnField.asset_receiver: Global.current_application_address(),
-                       TxnField.asset_amount: Btoi(Txn.application_args[1]),
-                       TxnField.xfer_asset: Txn.assets[0],
-                       TxnField.sender: Txn.sender(),
-                       TxnField.rekey_to: Txn.sender()
-                   }
-                ),
-                InnerTxnBuilder.Submit(),
+                # ## 
+                # InnerTxnBuilder.Begin(),
+                # InnerTxnBuilder.SetFields(
+                #    {
+                #        TxnField.type_enum: TxnType.AssetTransfer,
+                #        TxnField.asset_receiver: Global.current_application_address(),
+                #        TxnField.asset_amount: Btoi(Txn.application_args[1]),
+                #        TxnField.xfer_asset: Txn.assets[0],
+                #        TxnField.sender: Txn.sender(),
+                #        TxnField.rekey_to: Txn.sender()
+                #    }
+                # ),
+                # InnerTxnBuilder.Submit(),
                 
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes("_key")),  Txn.application_args[2]),
-                App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount')),  Btoi(Txn.application_args[1])),
+                App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount')),  Gtxn[0].asset_amount()),
                 App.localPut(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_asset')),  Txn.assets[0]),
-                App.globalPut(staked_amount, App.globalGet(staked_amount) + Btoi(Txn.application_args[1])),
+                App.globalPut(staked_amount, App.globalGet(staked_amount) + Gtxn[0].asset_amount()),
                 
                 If(App.globalGet(staked_amount) * Int(10000) >= App.globalGet(loan_amount))
                 .Then(
@@ -198,19 +201,14 @@ def approval():
         # allow  account to transfer USDCa tokens to liquidity pool as loan payment
         # preconditions:
         #       must have enough tokens
-        # agentAssetBalance = AssetHolding.balance(Gtxn[0].asset_sender() , Txn.assets[0])
         return Seq(
-                # agentAssetBalance,
-                # Assert(agentAssetBalance.hasValue()),
-
-                # Assert(agentAssetBalance.value() >= Gtxn[0].asset_amount()),
-
-
+                Assert(App.globalGet(Bytes('loan_state')) == Bytes('alive')),
                 Assert(Gtxn[0].type_enum() == TxnType.AssetTransfer),
                 # Assert(Gtxn[0].asset_sender() == Txn.sender()),
                 Assert(Gtxn[0].asset_receiver() == Global.current_application_address()),
                 Assert(Gtxn[0].xfer_asset() == Txn.assets[0]),
                 Assert(Gtxn[0].asset_amount() <= App.globalGet(balance)),
+                Assert(Gtxn[0].xfer_asset() == App.globalGet(stable_token)),
                 Assert(Gtxn[0].asset_amount() >= Int(0)),
   
                 App.globalPut(balance, App.globalGet(balance) - Gtxn[0].asset_amount()),
