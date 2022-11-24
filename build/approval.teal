@@ -46,30 +46,29 @@ byte "force_close"
 ==
 bnz main_l16
 txna ApplicationArgs 0
-byte "check_default"
+byte "default_contract"
 ==
 bnz main_l14
 err
 main_l14:
-int 1
-return
+callsub defaultContract_0
 main_l15:
 int 1
 return
 main_l16:
-int 1
-return
+callsub forceclose_1
+b main_l15
 main_l17:
-callsub escrowconfig_2
+callsub escrowconfig_4
 b main_l15
 main_l18:
-callsub invest_0
+callsub invest_2
 b main_l15
 main_l19:
-callsub reclaim_1
+callsub reclaim_3
 b main_l15
 main_l20:
-callsub repay_3
+callsub repay_5
 b main_l15
 main_l21:
 int 0
@@ -92,6 +91,20 @@ assert
 txna ApplicationArgs 2
 btoi
 int 0
+>
+assert
+global LatestTimestamp
+txna ApplicationArgs 3
+btoi
+int 100
+*
+>
+assert
+global LatestTimestamp
+txna ApplicationArgs 4
+btoi
+int 100
+*
 >
 assert
 txna ApplicationArgs 4
@@ -118,10 +131,14 @@ app_global_put
 byte "start_date"
 txna ApplicationArgs 3
 btoi
+int 100
+*
 app_global_put
 byte "end_date"
 txna ApplicationArgs 4
 btoi
+int 100
+*
 app_global_put
 byte "pool_address"
 txna Accounts 1
@@ -135,6 +152,12 @@ app_global_put
 byte "stable_token"
 txna Assets 0
 app_global_put
+byte "trust_token"
+txna Assets 1
+app_global_put
+byte "backer_token"
+txna Assets 2
+app_global_put
 byte "loan_state"
 byte "openToInvestment"
 app_global_put
@@ -147,12 +170,201 @@ app_global_put
 int 1
 return
 
-// invest
-invest_0:
+// defaultContract
+defaultContract_0:
+byte "manager"
+app_global_get
+txn Sender
+==
+assert
+global LatestTimestamp
+byte "end_date"
+app_global_get
+>
+assert
+byte "balance"
+app_global_get
+int 0
+>
+assert
+byte "loan_state"
+app_global_get
+byte "alive"
+==
 byte "loan_state"
 app_global_get
 byte "openToInvestment"
 ==
+||
+assert
+global CurrentApplicationAddress
+byte "stable_token"
+app_global_get
+asset_holding_get AssetBalance
+store 1
+store 0
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "pool_address"
+app_global_get
+itxn_field AssetReceiver
+load 0
+itxn_field AssetAmount
+byte "stable_token"
+app_global_get
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+global CurrentApplicationAddress
+byte "trust_token"
+app_global_get
+asset_holding_get AssetBalance
+store 3
+store 2
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "pool_address"
+app_global_get
+itxn_field AssetReceiver
+load 2
+itxn_field AssetAmount
+byte "trust_token"
+app_global_get
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+global CurrentApplicationAddress
+byte "backer_token"
+app_global_get
+asset_holding_get AssetBalance
+store 5
+store 4
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "pool_address"
+app_global_get
+itxn_field AssetReceiver
+load 4
+itxn_field AssetAmount
+byte "backer_token"
+app_global_get
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+byte "loan_state"
+byte "defaulted"
+app_global_put
+retsub
+
+// force_close
+forceclose_1:
+byte "manager"
+app_global_get
+txn Sender
+==
+assert
+global LatestTimestamp
+byte "end_date"
+app_global_get
+>
+assert
+byte "balance"
+app_global_get
+int 0
+>
+assert
+byte "loan_state"
+app_global_get
+byte "alive"
+==
+byte "loan_state"
+app_global_get
+byte "openToInvestment"
+==
+||
+assert
+global CurrentApplicationAddress
+byte "stable_token"
+app_global_get
+asset_holding_get AssetBalance
+store 7
+store 6
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "pool_address"
+app_global_get
+itxn_field AssetReceiver
+load 6
+itxn_field AssetAmount
+byte "stable_token"
+app_global_get
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+global CurrentApplicationAddress
+byte "trust_token"
+app_global_get
+asset_holding_get AssetBalance
+store 9
+store 8
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "pool_address"
+app_global_get
+itxn_field AssetReceiver
+load 8
+itxn_field AssetAmount
+byte "trust_token"
+app_global_get
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+global CurrentApplicationAddress
+byte "backer_token"
+app_global_get
+asset_holding_get AssetBalance
+store 11
+store 10
+itxn_begin
+int axfer
+itxn_field TypeEnum
+byte "pool_address"
+app_global_get
+itxn_field AssetReceiver
+load 10
+itxn_field AssetAmount
+byte "backer_token"
+app_global_get
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+byte "loan_state"
+byte "defaulted"
+app_global_put
+retsub
+
+// invest
+invest_2:
+byte "loan_state"
+app_global_get
+byte "openToInvestment"
+==
+assert
+global LatestTimestamp
+byte "end_date"
+app_global_get
+<
 assert
 gtxn 0 TypeEnum
 int axfer
@@ -212,7 +424,7 @@ int 10000
 byte "loan_amount"
 app_global_get
 >=
-bz invest_0_l2
+bz invest_2_l2
 byte "loan_state"
 byte "alive"
 app_global_put
@@ -231,11 +443,11 @@ itxn_field XferAsset
 global CurrentApplicationAddress
 itxn_field Sender
 itxn_submit
-invest_0_l2:
+invest_2_l2:
 retsub
 
 // reclaim
-reclaim_1:
+reclaim_3:
 byte "loan_state"
 app_global_get
 byte "matured"
@@ -278,7 +490,7 @@ int 1
 return
 
 // escrow_config
-escrowconfig_2:
+escrowconfig_4:
 byte "manager"
 app_global_get
 txn Sender
@@ -323,7 +535,12 @@ itxn_submit
 retsub
 
 // repay
-repay_3:
+repay_5:
+byte "loan_state"
+app_global_get
+byte "alive"
+==
+assert
 gtxn 0 TypeEnum
 int axfer
 ==
@@ -360,7 +577,7 @@ byte "balance"
 app_global_get
 int 0
 ==
-bz repay_3_l2
+bz repay_5_l2
 byte "loan_state"
 byte "matured"
 app_global_put
@@ -380,5 +597,5 @@ itxn_field XferAsset
 global CurrentApplicationAddress
 itxn_field Sender
 itxn_submit
-repay_3_l2:
+repay_5_l2:
 retsub
