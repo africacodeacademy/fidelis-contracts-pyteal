@@ -269,11 +269,6 @@ app_global_get
 txn Sender
 ==
 assert
-global LatestTimestamp
-byte "end_date"
-app_global_get
->
-assert
 byte "balance"
 app_global_get
 int 0
