@@ -93,26 +93,6 @@ btoi
 int 0
 >
 assert
-global LatestTimestamp
-txna ApplicationArgs 3
-btoi
-int 100
-*
->
-assert
-global LatestTimestamp
-txna ApplicationArgs 4
-btoi
-int 100
-*
->
-assert
-txna ApplicationArgs 4
-btoi
-txna ApplicationArgs 3
-btoi
->
-assert
 byte "balance"
 txna ApplicationArgs 1
 btoi
