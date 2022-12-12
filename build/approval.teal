@@ -157,11 +157,6 @@ app_global_get
 txn Sender
 ==
 assert
-global LatestTimestamp
-byte "end_date"
-app_global_get
->
-assert
 byte "balance"
 app_global_get
 int 0
@@ -335,11 +330,6 @@ byte "loan_state"
 app_global_get
 byte "openToInvestment"
 ==
-assert
-global LatestTimestamp
-byte "end_date"
-app_global_get
-<
 assert
 gtxn 0 TypeEnum
 int axfer
