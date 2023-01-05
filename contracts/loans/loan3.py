@@ -31,7 +31,7 @@ def approval():
 
         return Seq(
                 Assert(App.globalGet(Bytes("manager")) == Txn.sender()),
-                Assert(Global.latest_timestamp() > App.globalGet(end_date)),
+                # Assert(Global.latest_timestamp() > App.globalGet(end_date)),
                 Assert(App.globalGet(balance) > Int(0)),
                 Assert(Or(
                     App.globalGet(Bytes('loan_state')) == Bytes('alive'),
@@ -94,7 +94,7 @@ def approval():
 
         return Seq(
                 Assert(App.globalGet(Bytes("manager")) == Txn.sender()),
-                Assert(Global.latest_timestamp() > App.globalGet(end_date)),
+                # Assert(Global.latest_timestamp() > App.globalGet(end_date)),
                 Assert(App.globalGet(balance) > Int(0)),
                 Assert(Or(
                     App.globalGet(Bytes('loan_state')) == Bytes('alive'),
@@ -169,9 +169,9 @@ def approval():
     handle_creation = Seq(
         Assert(Btoi(Txn.application_args[1]) > Int(0)), #check valid loan amount
         Assert(Btoi(Txn.application_args[2]) > Int(0)), #check valid fee
-        Assert(Global.latest_timestamp() > (Btoi(Txn.application_args[3])*Int(100))), #check loan start timestamp
-        Assert(Global.latest_timestamp() > (Btoi(Txn.application_args[4])*Int(100))), #check loan end timestamp
-        Assert(Btoi(Txn.application_args[4]) > Btoi(Txn.application_args[3])), #check valid dates
+        # Assert(Global.latest_timestamp() > (Btoi(Txn.application_args[3])*Int(100))), #check loan start timestamp
+        # Assert(Global.latest_timestamp() > (Btoi(Txn.application_args[4])*Int(100))), #check loan end timestamp
+        # Assert(Btoi(Txn.application_args[4]) > Btoi(Txn.application_args[3])), #check valid dates
         App.globalPut(balance,  Btoi(Txn.application_args[1])+Btoi(Txn.application_args[2])), #assign new balance (loan amount + interest fee)
         App.globalPut(loan_amount, Btoi(Txn.application_args[1])), #store original loan amount before interest
         App.globalPut(fee, Btoi(Txn.application_args[2])), #store interest fee
@@ -201,7 +201,7 @@ def approval():
         #   Missing verify asset tokens against known expected tokens
         return Seq(
                 Assert(App.globalGet(loan_state) == Bytes('openToInvestment')),
-                Assert(Global.latest_timestamp() < App.globalGet(end_date)),
+                # Assert(Global.latest_timestamp() < App.globalGet(end_date)),
                 Assert(Gtxn[0].type_enum() == TxnType.AssetTransfer),
                 # Assert(Gtxn[0].asset_sender() == Txn.sender()),
                 Assert(Gtxn[0].asset_receiver() == Global.current_application_address()),
