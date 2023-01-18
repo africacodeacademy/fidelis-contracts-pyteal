@@ -2,23 +2,23 @@
 txn ApplicationID
 int 0
 ==
-bnz main_l25
+bnz main_l23
 txn OnCompletion
 int DeleteApplication
 ==
-bnz main_l24
+bnz main_l22
 txn OnCompletion
 int UpdateApplication
 ==
-bnz main_l23
+bnz main_l21
 txn OnCompletion
 int OptIn
 ==
-bnz main_l22
+bnz main_l20
 txn OnCompletion
 int CloseOut
 ==
-bnz main_l21
+bnz main_l19
 txn OnCompletion
 int NoOp
 ==
@@ -28,61 +28,54 @@ main_l7:
 txna ApplicationArgs 0
 byte "payment"
 ==
-bnz main_l20
+bnz main_l18
 txna ApplicationArgs 0
 byte "reclaim"
 ==
-bnz main_l19
+bnz main_l17
 txna ApplicationArgs 0
 byte "invest"
 ==
-bnz main_l18
-txna ApplicationArgs 0
-byte "config"
-==
-bnz main_l17
+bnz main_l16
 txna ApplicationArgs 0
 byte "force_close"
 ==
-bnz main_l16
+bnz main_l15
 txna ApplicationArgs 0
 byte "default_contract"
 ==
-bnz main_l14
+bnz main_l13
 err
-main_l14:
+main_l13:
 callsub defaultContract_0
-main_l15:
+main_l14:
 int 1
 return
-main_l16:
+main_l15:
 callsub forceclose_1
-b main_l15
-main_l17:
-callsub escrowconfig_4
-b main_l15
-main_l18:
+b main_l14
+main_l16:
 callsub invest_2
-b main_l15
-main_l19:
+b main_l14
+main_l17:
 callsub reclaim_3
-b main_l15
+b main_l14
+main_l18:
+callsub repay_4
+b main_l14
+main_l19:
+int 0
+return
 main_l20:
-callsub repay_5
-b main_l15
+int 1
+return
 main_l21:
 int 0
 return
 main_l22:
-int 1
+int 0
 return
 main_l23:
-int 0
-return
-main_l24:
-int 0
-return
-main_l25:
 txna ApplicationArgs 1
 btoi
 int 0
@@ -147,6 +140,42 @@ app_global_put
 byte "manager"
 txn Sender
 app_global_put
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 1
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
+itxn_begin
+int axfer
+itxn_field TypeEnum
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+txna Assets 2
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field Sender
+itxn_submit
 int 1
 return
 
@@ -335,6 +364,22 @@ gtxn 0 TypeEnum
 int axfer
 ==
 assert
+gtxn 0 RekeyTo
+txn Sender
+==
+assert
+gtxn 1 RekeyTo
+txn Sender
+==
+assert
+gtxn 0 AssetSender
+txn Sender
+==
+assert
+gtxn 1 AssetSender
+txn Sender
+==
+assert
 gtxn 0 AssetReceiver
 global CurrentApplicationAddress
 ==
@@ -427,6 +472,10 @@ app_local_get
 int 0
 !=
 assert
+txn RekeyTo
+txn Sender
+==
+assert
 itxn_begin
 int axfer
 itxn_field TypeEnum
@@ -454,53 +503,8 @@ app_local_put
 int 1
 return
 
-// escrow_config
-escrowconfig_4:
-byte "manager"
-app_global_get
-txn Sender
-==
-assert
-itxn_begin
-int axfer
-itxn_field TypeEnum
-global CurrentApplicationAddress
-itxn_field AssetReceiver
-int 0
-itxn_field AssetAmount
-txna Assets 0
-itxn_field XferAsset
-global CurrentApplicationAddress
-itxn_field Sender
-itxn_submit
-itxn_begin
-int axfer
-itxn_field TypeEnum
-global CurrentApplicationAddress
-itxn_field AssetReceiver
-int 0
-itxn_field AssetAmount
-txna Assets 1
-itxn_field XferAsset
-global CurrentApplicationAddress
-itxn_field Sender
-itxn_submit
-itxn_begin
-int axfer
-itxn_field TypeEnum
-global CurrentApplicationAddress
-itxn_field AssetReceiver
-int 0
-itxn_field AssetAmount
-txna Assets 2
-itxn_field XferAsset
-global CurrentApplicationAddress
-itxn_field Sender
-itxn_submit
-retsub
-
 // repay
-repay_5:
+repay_4:
 byte "loan_state"
 app_global_get
 byte "alive"
@@ -532,6 +536,14 @@ gtxn 0 AssetAmount
 int 0
 >=
 assert
+gtxn 0 RekeyTo
+txn Sender
+==
+assert
+gtxn 1 RekeyTo
+txn Sender
+==
+assert
 byte "balance"
 byte "balance"
 app_global_get
@@ -542,7 +554,7 @@ byte "balance"
 app_global_get
 int 0
 ==
-bz repay_5_l2
+bz repay_4_l2
 byte "loan_state"
 byte "matured"
 app_global_put
@@ -562,5 +574,5 @@ itxn_field XferAsset
 global CurrentApplicationAddress
 itxn_field Sender
 itxn_submit
-repay_5_l2:
+repay_4_l2:
 retsub

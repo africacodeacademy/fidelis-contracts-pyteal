@@ -186,6 +186,39 @@ def approval():
         App.globalPut(loan_state, Bytes('openToInvestment')), # store initial loan state
         App.globalPut(staked_amount, Int(0)), # store initial staked amount
         App.globalPut(manager, Txn.sender()), #store manager address
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.AssetTransfer,
+                TxnField.asset_receiver: Global.current_application_address(),
+                TxnField.asset_amount: Int(0),
+                TxnField.xfer_asset: Txn.assets[0],
+                TxnField.sender: Global.current_application_address(),
+            }
+        ),
+        InnerTxnBuilder.Submit(),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.AssetTransfer,
+                TxnField.asset_receiver: Global.current_application_address(),
+                TxnField.asset_amount: Int(0),
+                TxnField.xfer_asset: Txn.assets[1],
+                TxnField.sender: Global.current_application_address(),
+            }
+        ),
+        InnerTxnBuilder.Submit(),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.AssetTransfer,
+                TxnField.asset_receiver: Global.current_application_address(),
+                TxnField.asset_amount: Int(0),
+                TxnField.xfer_asset: Txn.assets[2],
+                TxnField.sender: Global.current_application_address(),
+            }
+        ),
+        InnerTxnBuilder.Submit(),
         Approve()
     )
 
@@ -203,7 +236,10 @@ def approval():
                 Assert(App.globalGet(loan_state) == Bytes('openToInvestment')),
                 # Assert(Global.latest_timestamp() < App.globalGet(end_date)),
                 Assert(Gtxn[0].type_enum() == TxnType.AssetTransfer),
-                # Assert(Gtxn[0].asset_sender() == Txn.sender()),
+                Assert(Gtxn[0].rekey_to() == Txn.sender()),
+                Assert(Gtxn[1].rekey_to() == Txn.sender()),
+                Assert(Gtxn[0].asset_sender() == Txn.sender()),
+                Assert(Gtxn[1].asset_sender() == Txn.sender()),
                 Assert(Gtxn[0].asset_receiver() == Global.current_application_address()),
                 Assert(Gtxn[0].xfer_asset() == Txn.assets[0]),
                 Assert(Gtxn[0].asset_amount() > Int(0)),
@@ -220,7 +256,7 @@ def approval():
                         App.globalPut(loan_state, Bytes('alive')),
                         InnerTxnBuilder.Begin(),
                         InnerTxnBuilder.SetFields(
-                            {
+                            { 
                                 TxnField.type_enum: TxnType.AssetTransfer,
                                 TxnField.asset_receiver: App.globalGet(agent_address),
                                 TxnField.asset_amount: App.globalGet(loan_amount),
@@ -244,6 +280,8 @@ def approval():
         return Seq(
                 Assert(App.globalGet(Bytes('loan_state')) == Bytes('matured')),
                 Assert(App.localGet(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount'))) != Int(0)),
+                Assert(Txn.rekey_to() == Txn.sender()),
+                
                 # TODO:: Validate encryption key
 
                 InnerTxnBuilder.Begin(),
@@ -261,45 +299,6 @@ def approval():
                 Approve(),
             )
 
-    @Subroutine(TealType.none)
-    def escrow_config():
-        # Configuring the escrow account
-        return Seq(
-                Assert(App.globalGet(Bytes("manager")) == Txn.sender()),
-                InnerTxnBuilder.Begin(),
-                InnerTxnBuilder.SetFields(
-                    {
-                        TxnField.type_enum: TxnType.AssetTransfer,
-                        TxnField.asset_receiver: Global.current_application_address(),
-                        TxnField.asset_amount: Int(0),
-                        TxnField.xfer_asset: Txn.assets[0],
-                        TxnField.sender: Global.current_application_address(),
-                    }
-                ),
-                InnerTxnBuilder.Submit(),
-                InnerTxnBuilder.Begin(),
-                InnerTxnBuilder.SetFields(
-                    {
-                        TxnField.type_enum: TxnType.AssetTransfer,
-                        TxnField.asset_receiver: Global.current_application_address(),
-                        TxnField.asset_amount: Int(0),
-                        TxnField.xfer_asset: Txn.assets[1],
-                        TxnField.sender: Global.current_application_address(),
-                    }
-                ),
-                InnerTxnBuilder.Submit(),
-                InnerTxnBuilder.Begin(),
-                InnerTxnBuilder.SetFields(
-                    {
-                        TxnField.type_enum: TxnType.AssetTransfer,
-                        TxnField.asset_receiver: Global.current_application_address(),
-                        TxnField.asset_amount: Int(0),
-                        TxnField.xfer_asset: Txn.assets[2],
-                        TxnField.sender: Global.current_application_address(),
-                    }
-                ),
-                InnerTxnBuilder.Submit(),
-            )
 
 
     @Subroutine(TealType.none)
@@ -316,7 +315,9 @@ def approval():
                 Assert(Gtxn[0].asset_amount() <= App.globalGet(balance)),
                 Assert(Gtxn[0].xfer_asset() == App.globalGet(stable_token)),
                 Assert(Gtxn[0].asset_amount() >= Int(0)),
-  
+                Assert(Gtxn[0].rekey_to() == Txn.sender()),
+                Assert(Gtxn[1].rekey_to() == Txn.sender()),
+
                 App.globalPut(balance, App.globalGet(balance) - Gtxn[0].asset_amount()),
                 If(App.globalGet(balance) == Int(0))
                 .Then(
@@ -345,7 +346,6 @@ def approval():
                 [Txn.application_args[0] == Bytes("payment"), repay()],
                 [Txn.application_args[0] == Bytes("reclaim"), reclaim()],
                 [Txn.application_args[0] == Bytes("invest"), invest()],
-                [Txn.application_args[0] == Bytes("config"), escrow_config()],
                 [Txn.application_args[0] == Bytes("force_close"), force_close()],
                 [Txn.application_args[0] == Bytes("default_contract"), defaultContract()]
             ),
