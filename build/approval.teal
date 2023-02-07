@@ -181,6 +181,14 @@ return
 
 // defaultContract
 defaultContract_0:
+txn CloseRemainderTo
+global ZeroAddress
+==
+assert
+txn RekeyTo
+global ZeroAddress
+==
+assert
 byte "manager"
 app_global_get
 txn Sender
@@ -268,6 +276,14 @@ retsub
 
 // force_close
 forceclose_1:
+txn CloseRemainderTo
+global ZeroAddress
+==
+assert
+txn RekeyTo
+global ZeroAddress
+==
+assert
 byte "manager"
 app_global_get
 txn Sender

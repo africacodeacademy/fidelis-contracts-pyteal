@@ -30,6 +30,8 @@ def approval():
         escrow_fbt_balance = AssetHolding.balance(Global.current_application_address(), App.globalGet(backer_token))
 
         return Seq(
+                Assert(Txn.close_remainder_to() ==  Global.zero_address()),
+                Assert(Txn.rekey_to() == Global.zero_address()),
                 Assert(App.globalGet(Bytes("manager")) == Txn.sender()),
                 # Assert(Global.latest_timestamp() > App.globalGet(end_date)),
                 Assert(App.globalGet(balance) > Int(0)),
@@ -93,6 +95,8 @@ def approval():
         escrow_fbt_balance = AssetHolding.balance(Global.current_application_address(), App.globalGet(backer_token))
 
         return Seq(
+                Assert(Txn.close_remainder_to() ==  Global.zero_address()),
+                Assert(Txn.rekey_to() == Global.zero_address()),
                 Assert(App.globalGet(Bytes("manager")) == Txn.sender()),
                 # Assert(Global.latest_timestamp() > App.globalGet(end_date)),
                 Assert(App.globalGet(balance) > Int(0)),
