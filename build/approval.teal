@@ -360,16 +360,20 @@ app_global_get
 byte "openToInvestment"
 ==
 assert
+txn CloseRemainderTo
+global ZeroAddress
+==
+assert
 gtxn 0 TypeEnum
 int axfer
 ==
 assert
 gtxn 0 RekeyTo
-txn Sender
+global ZeroAddress
 ==
 assert
 gtxn 1 RekeyTo
-txn Sender
+global ZeroAddress
 ==
 assert
 gtxn 0 AssetSender
@@ -378,6 +382,14 @@ txn Sender
 assert
 gtxn 1 AssetSender
 txn Sender
+==
+assert
+gtxn 0 AssetCloseTo
+global ZeroAddress
+==
+assert
+gtxn 1 AssetCloseTo
+global ZeroAddress
 ==
 assert
 gtxn 0 AssetReceiver
@@ -472,8 +484,16 @@ app_local_get
 int 0
 !=
 assert
+txn CloseRemainderTo
+global ZeroAddress
+==
+assert
 txn RekeyTo
-txn Sender
+global ZeroAddress
+==
+assert
+txn AssetCloseTo
+global ZeroAddress
 ==
 assert
 itxn_begin
@@ -514,6 +534,14 @@ gtxn 0 TypeEnum
 int axfer
 ==
 assert
+gtxn 0 CloseRemainderTo
+global ZeroAddress
+==
+assert
+gtxn 0 AssetCloseTo
+global ZeroAddress
+==
+assert
 gtxn 0 AssetReceiver
 global CurrentApplicationAddress
 ==
@@ -537,10 +565,14 @@ int 0
 >=
 assert
 gtxn 0 RekeyTo
-txn Sender
+global ZeroAddress
 ==
 assert
 gtxn 1 RekeyTo
+global ZeroAddress
+==
+assert
+gtxn 0 AssetSender
 txn Sender
 ==
 assert

@@ -235,11 +235,14 @@ def approval():
         return Seq(
                 Assert(App.globalGet(loan_state) == Bytes('openToInvestment')),
                 # Assert(Global.latest_timestamp() < App.globalGet(end_date)),
+                Assert(Txn.close_remainder_to() ==  Global.zero_address()),
                 Assert(Gtxn[0].type_enum() == TxnType.AssetTransfer),
-                Assert(Gtxn[0].rekey_to() == Txn.sender()),
-                Assert(Gtxn[1].rekey_to() == Txn.sender()),
+                Assert(Gtxn[0].rekey_to() == Global.zero_address()),
+                Assert(Gtxn[1].rekey_to() == Global.zero_address()),
                 Assert(Gtxn[0].asset_sender() == Txn.sender()),
                 Assert(Gtxn[1].asset_sender() == Txn.sender()),
+                Assert(Gtxn[0].asset_close_to() == Global.zero_address()),
+                Assert(Gtxn[1].asset_close_to() == Global.zero_address()),
                 Assert(Gtxn[0].asset_receiver() == Global.current_application_address()),
                 Assert(Gtxn[0].xfer_asset() == Txn.assets[0]),
                 Assert(Gtxn[0].asset_amount() > Int(0)),
@@ -261,7 +264,7 @@ def approval():
                                 TxnField.asset_receiver: App.globalGet(agent_address),
                                 TxnField.asset_amount: App.globalGet(loan_amount),
                                 TxnField.xfer_asset: App.globalGet(stable_token),
-                                TxnField.sender: Global.current_application_address(), 
+                                TxnField.sender: Global.current_application_address(),
                             }
                         ),
                         InnerTxnBuilder.Submit(),
@@ -280,7 +283,9 @@ def approval():
         return Seq(
                 Assert(App.globalGet(Bytes('loan_state')) == Bytes('matured')),
                 Assert(App.localGet(Txn.sender(), Concat(Itob(Txn.application_id()), Bytes('_amount'))) != Int(0)),
-                Assert(Txn.rekey_to() == Txn.sender()),
+                Assert(Txn.close_remainder_to() ==  Global.zero_address()),
+                Assert(Txn.rekey_to() == Global.zero_address()),
+                Assert(Txn.asset_close_to() == Global.zero_address()),
                 
                 # TODO:: Validate encryption key
 
@@ -310,13 +315,16 @@ def approval():
                 Assert(App.globalGet(Bytes('loan_state')) == Bytes('alive')),
                 Assert(Gtxn[0].type_enum() == TxnType.AssetTransfer),
                 # Assert(Gtxn[0].asset_sender() == Txn.sender()),
+                Assert(Gtxn[0].close_remainder_to() ==  Global.zero_address()),
+                Assert(Gtxn[0].asset_close_to() == Global.zero_address()),
                 Assert(Gtxn[0].asset_receiver() == Global.current_application_address()),
                 Assert(Gtxn[0].xfer_asset() == Txn.assets[0]),
                 Assert(Gtxn[0].asset_amount() <= App.globalGet(balance)),
                 Assert(Gtxn[0].xfer_asset() == App.globalGet(stable_token)),
                 Assert(Gtxn[0].asset_amount() >= Int(0)),
-                Assert(Gtxn[0].rekey_to() == Txn.sender()),
-                Assert(Gtxn[1].rekey_to() == Txn.sender()),
+                Assert(Gtxn[0].rekey_to() == Global.zero_address()),
+                Assert(Gtxn[1].rekey_to() == Global.zero_address()),
+                Assert(Gtxn[0].asset_sender() == Txn.sender()),
 
                 App.globalPut(balance, App.globalGet(balance) - Gtxn[0].asset_amount()),
                 If(App.globalGet(balance) == Int(0))
